@@ -364,7 +364,7 @@ def render_category_card(dept_name, count, icon="📦"):
     """
 
 def render_bottom_nav(active_page):
-    """Render bottom navigation"""
+    """Render bottom navigation - simplified for Streamlit"""
     nav_items = [
         ("Products", "📦", "products"),
         ("Orders", "🔄", "orders"),
@@ -378,7 +378,7 @@ def render_bottom_nav(active_page):
     for label, icon, page_key in nav_items:
         active_class = "active" if active_page == page_key else ""
         nav_html += f"""
-        <div class="nav-item {active_class}" onclick="setPage('{page_key}')">
+        <div class="nav-item {active_class}">
             <div class="nav-icon">{icon}</div>
             <div class="nav-label">{label}</div>
         </div>
@@ -634,37 +634,72 @@ def main():
     if 'current_page' not in st.session_state:
         st.session_state.current_page = 'products'
     
-    # Handle navigation through query params or buttons
-    query_params = st.query_params
-    if 'page' in query_params:
-        st.session_state.current_page = query_params['page']
-    
-    # Create navigation buttons (hidden, just for functionality)
-    col1, col2, col3, col4, col5 = st.columns(5)
-    with col1:
-        if st.button("Products", key="nav_products"):
-            st.session_state.current_page = 'products'
-    with col2:
-        if st.button("Orders", key="nav_orders"):
-            st.session_state.current_page = 'orders'
-    with col3:
-        if st.button("Warehouses", key="nav_warehouses"):
-            st.session_state.current_page = 'warehouses'
-    with col4:
-        if st.button("Categories", key="nav_categories"):
-            st.session_state.current_page = 'categories'
-    with col5:
-        if st.button("Users", key="nav_users"):
-            st.session_state.current_page = 'users'
-    
-    # Hide the navigation buttons with CSS
+    # Navigation buttons (styled to look like the original nav)
     st.markdown("""
     <style>
-    .stColumns > div > div > button {
-        display: none;
+    .nav-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: #1f2937;
+        border-radius: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .nav-btn {
+        background: #374151;
+        color: white;
+        border: 1px solid #4b5563;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        min-width: 80px;
+        text-align: center;
+    }
+    .nav-btn.active {
+        background: #6366f1;
+        border-color: #6366f1;
     }
     </style>
     """, unsafe_allow_html=True)
+    
+    # Create navigation
+    col1, col2, col3, col4, col5 = st.columns(5)
+    
+    with col1:
+        if st.button("📦 Products", key="nav_products", 
+                    type="primary" if st.session_state.current_page == 'products' else "secondary"):
+            st.session_state.current_page = 'products'
+            st.rerun()
+    
+    with col2:
+        if st.button("🔄 Orders", key="nav_orders",
+                    type="primary" if st.session_state.current_page == 'orders' else "secondary"):
+            st.session_state.current_page = 'orders'
+            st.rerun()
+    
+    with col3:
+        if st.button("📍 Warehouses", key="nav_warehouses",
+                    type="primary" if st.session_state.current_page == 'warehouses' else "secondary"):
+            st.session_state.current_page = 'warehouses'
+            st.rerun()
+    
+    with col4:
+        if st.button("📂 Categories", key="nav_categories",
+                    type="primary" if st.session_state.current_page == 'categories' else "secondary"):
+            st.session_state.current_page = 'categories'
+            st.rerun()
+    
+    with col5:
+        if st.button("👥 Users", key="nav_users",
+                    type="primary" if st.session_state.current_page == 'users' else "secondary"):
+            st.session_state.current_page = 'users'
+            st.rerun()
+    
+    # Add some spacing
+    st.markdown("<br>", unsafe_allow_html=True)
     
     # Render the appropriate page
     if st.session_state.current_page == 'products':
@@ -678,16 +713,13 @@ def main():
     elif st.session_state.current_page == 'orders':
         orders_page()
     
-    # Render bottom navigation
-    st.markdown(render_bottom_nav(st.session_state.current_page), unsafe_allow_html=True)
-    
-    # JavaScript for navigation (this won't work in Streamlit Cloud, but shows the concept)
+    # Simple footer instead of complex bottom nav
     st.markdown("""
-    <script>
-    function setPage(page) {
-        window.location.href = window.location.pathname + '?page=' + page;
-    }
-    </script>
+    <div style="position: fixed; bottom: 0; left: 0; right: 0; background: white; 
+                border-top: 1px solid #e5e7eb; padding: 0.5rem; text-align: center; 
+                font-size: 0.8rem; color: #6b7280; z-index: 1000;">
+        PLU Product Catalog - Navigate using buttons above
+    </div>
     """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
