@@ -101,7 +101,15 @@ st.markdown("""
 def load_data():
     """Load and cache the PLU data"""
     try:
-        df = pd.read_csv('glide_products.csv')
+        # Read CSV with UPC codes as strings to preserve leading zeros
+        df = pd.read_csv('glide_products.csv', dtype={'UPC_Code': str})
+        
+        # Ensure UPC codes are properly formatted as strings
+        df['UPC_Code'] = df['UPC_Code'].astype(str)
+        
+        # Create a search-friendly UPC column (remove leading zeros for flexible search)
+        df['UPC_Search'] = df['UPC_Code'].str.lstrip('0')
+        
         return df
     except FileNotFoundError:
         st.error("Please make sure 'glide_products.csv' is in the same directory as this script")
@@ -147,14 +155,34 @@ def main():
     
     # Search and display results
     if search_term:
-        # Filter data based on search term
+        # Clean the search term
+        search_clean = search_term.strip()
+        
+        # For UPC search, try both with and without leading zeros
+        upc_search_variants = [search_clean]
+        if search_clean.isdigit():
+            # Add version with leading zeros removed
+            upc_search_variants.append(search_clean.lstrip('0'))
+            # Add version with leading zeros (common UPC formats)
+            if len(search_clean) < 12:
+                upc_search_variants.append(search_clean.zfill(12))  # Pad to 12 digits
+            if len(search_clean) < 14:
+                upc_search_variants.append(search_clean.zfill(14))  # Pad to 14 digits
+        
+        # Create comprehensive search mask
         search_mask = (
-            df['Product_Name'].str.contains(search_term, case=False, na=False) |
-            df['UPC_Code'].astype(str).str.contains(search_term, na=False) |
-            df['Department_Name'].str.contains(search_term, case=False, na=False) |
-            df['Category'].str.contains(search_term, case=False, na=False) |
-            df['Search_Terms'].str.contains(search_term, case=False, na=False)
+            df['Product_Name'].str.contains(search_clean, case=False, na=False) |
+            df['Department_Name'].str.contains(search_clean, case=False, na=False) |
+            df['Category'].str.contains(search_clean, case=False, na=False) |
+            df['Search_Terms'].str.contains(search_clean, case=False, na=False)
         )
+        
+        # Add UPC search for all variants
+        for variant in upc_search_variants:
+            search_mask = search_mask | (
+                df['UPC_Code'].str.contains(variant, case=False, na=False) |
+                df['UPC_Search'].str.contains(variant, case=False, na=False)
+            )
         
         filtered_df = df[search_mask]
         
