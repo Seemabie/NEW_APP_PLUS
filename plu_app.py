@@ -1,269 +1,324 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 from datetime import datetime
-import re
 
 # Configure page
 st.set_page_config(
     page_title="PLU Product Catalog",
     page_icon="🛍️",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
-# Custom CSS for mobile-friendly UI
+# Custom CSS to match the inventory app design exactly
 st.markdown("""
 <style>
-    /* Mobile-first responsive design */
+    /* Hide Streamlit default elements */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    
+    /* Main container styling */
     .main > div {
-        padding-top: 1rem;
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
+        padding-top: 0rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-bottom: 5rem; /* Space for bottom nav */
     }
     
-    /* Mobile-optimized inputs */
-    .stSelectbox > div > div {
-        background-color: #f8f9fa;
+    /* Header styling to match inventory app */
+    .app-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        margin-bottom: 1rem;
+    }
+    
+    .app-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #000;
+        margin: 0;
+    }
+    
+    .add-button {
+        background: #6366f1;
+        color: white;
+        padding: 0.5rem 1rem;
         border-radius: 8px;
-        min-height: 44px; /* Touch-friendly height */
+        border: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
     
-    .stTextInput > div > div > input {
-        font-size: 16px; /* Prevents zoom on iOS */
-        padding: 12px;
-        border-radius: 8px;
+    /* Search bar styling */
+    .search-container {
+        background: #f3f4f6;
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
     
-    .stSlider > div > div {
-        padding: 10px 0;
+    .search-input {
+        background: transparent;
+        border: none;
+        outline: none;
+        font-size: 1rem;
+        color: #9ca3af;
+        width: 100%;
     }
     
-    /* Mobile-optimized product cards */
+    /* Category section styling */
+    .category-section {
+        margin-bottom: 2rem;
+    }
+    
+    .category-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .category-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #000;
+        margin: 0;
+    }
+    
+    .see-all-link {
+        color: #6366f1;
+        font-size: 0.9rem;
+        font-weight: 500;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    
+    /* Product cards grid */
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+        .products-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    /* Product card styling */
     .product-card {
         background: white;
-        padding: 1rem;
         border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        border: 1px solid #e9ecef;
-        margin-bottom: 1rem;
-        transition: transform 0.2s;
+        padding: 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border: 1px solid #e5e7eb;
         cursor: pointer;
-        touch-action: manipulation;
+        transition: all 0.2s;
     }
     
-    .product-card:hover, .product-card:active {
+    .product-card:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
     
-    .category-header {
-        color: #6c5ce7;
+    .product-image {
+        width: 100%;
+        height: 80px;
+        background: #1f2937;
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    
+    .product-dots {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        color: #6b7280;
+        font-size: 1rem;
+    }
+    
+    .product-category-label {
+        font-size: 0.7rem;
+        color: #6366f1;
         font-weight: 600;
-        font-size: 1.1rem;
-        margin: 1.5rem 0 0.8rem 0;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #6c5ce7;
-        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.25rem;
     }
     
     .product-name {
+        font-size: 0.9rem;
         font-weight: 600;
-        color: #2d3436;
-        font-size: 0.95rem;
+        color: #000;
+        line-height: 1.2;
         margin-bottom: 0.5rem;
-        line-height: 1.3;
-        word-wrap: break-word;
+        min-height: 2.4rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
     
     .product-price {
-        color: #00b894;
-        font-size: 1.3rem;
-        font-weight: bold;
-        margin: 0.5rem 0;
-    }
-    
-    .product-department {
-        color: #636e72;
-        font-size: 0.85rem;
-        margin-bottom: 0.3rem;
-    }
-    
-    .product-upc {
-        color: #74b9ff;
-        font-size: 0.75rem;
-        font-family: monospace;
-        background: #f8f9fa;
-        padding: 0.2rem 0.4rem;
-        border-radius: 4px;
-        display: inline-block;
-    }
-    
-    .age-restricted {
-        background: #ff6b6b;
-        color: white;
-        padding: 0.3rem 0.6rem;
-        border-radius: 6px;
-        font-size: 0.7rem;
-        font-weight: bold;
-        display: inline-block;
-        margin-top: 0.5rem;
-    }
-    
-    .stock-status {
-        background: #00b894;
-        color: white;
-        padding: 0.3rem 0.6rem;
-        border-radius: 6px;
-        font-size: 0.7rem;
-        margin-left: 0.5rem;
-        display: inline-block;
-    }
-    
-    /* Mobile-optimized stats cards */
-    .stats-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 1rem;
-        border-radius: 12px;
-        text-align: center;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        margin-bottom: 0.5rem;
-    }
-    
-    .stats-number {
-        font-size: 1.5rem;
-        font-weight: bold;
-        margin-bottom: 0.3rem;
-    }
-    
-    .stats-label {
         font-size: 0.8rem;
-        opacity: 0.9;
+        color: #6b7280;
     }
     
-    .sidebar-header {
-        background: #6c5ce7;
-        color: white;
-        padding: 0.8rem;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-        text-align: center;
-        font-weight: bold;
-        font-size: 0.9rem;
-    }
-    
-    /* Mobile navigation buttons */
-    .nav-button {
-        background: #6c5ce7;
-        color: white;
-        padding: 0.8rem 1.5rem;
-        border-radius: 25px;
-        border: none;
-        font-size: 0.9rem;
-        font-weight: 600;
-        margin: 0.2rem;
-        cursor: pointer;
-        touch-action: manipulation;
-        transition: all 0.2s;
-    }
-    
-    .nav-button:hover, .nav-button:active {
-        background: #5a4fcf;
-        transform: scale(1.05);
-    }
-    
-    .nav-button.active {
-        background: #341f97;
-    }
-    
-    /* Search bar mobile optimization */
-    .search-container {
-        background: white;
-        border-radius: 25px;
-        padding: 0.5rem 1rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        margin-bottom: 1rem;
-        border: 2px solid #e9ecef;
-    }
-    
-    .search-container:focus-within {
-        border-color: #6c5ce7;
-        box-shadow: 0 2px 10px rgba(108, 92, 231, 0.2);
-    }
-    
-    /* Quick filter buttons */
-    .filter-chip {
-        background: #f1f3f4;
-        color: #5f6368;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
+    .product-stock {
         font-size: 0.8rem;
+        color: #10b981;
         font-weight: 500;
-        margin: 0.2rem;
-        cursor: pointer;
-        border: 1px solid #dadce0;
-        display: inline-block;
-        touch-action: manipulation;
     }
     
-    .filter-chip.active {
-        background: #6c5ce7;
-        color: white;
-        border-color: #6c5ce7;
-    }
-    
-    /* Mobile table improvements */
-    .dataframe {
-        font-size: 0.8rem;
-    }
-    
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .stats-card {
-            padding: 0.8rem;
-        }
-        
-        .stats-number {
-            font-size: 1.3rem;
-        }
-        
-        .product-card {
-            padding: 0.8rem;
-        }
-        
-        .product-name {
-            font-size: 0.9rem;
-        }
-        
-        .product-price {
-            font-size: 1.1rem;
-        }
-        
-        .category-header {
-            font-size: 1rem;
-            margin: 1rem 0 0.5rem 0;
-        }
-    }
-    
-    /* Hide sidebar toggle on mobile for cleaner look */
-    @media (max-width: 640px) {
-        .css-1d391kg {
-            padding: 1rem 0.5rem;
-        }
-    }
-    
-    /* Bottom sheet style for mobile filters */
-    .mobile-filters {
+    /* Bottom navigation */
+    .bottom-nav {
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
         background: white;
-        border-radius: 20px 20px 0 0;
-        box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
-        padding: 1rem;
+        border-top: 1px solid #e5e7eb;
+        padding: 0.5rem 0;
         z-index: 1000;
+    }
+    
+    .nav-items {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+        padding: 0.5rem;
+        text-decoration: none;
+        color: #6b7280;
+        transition: color 0.2s;
+    }
+    
+    .nav-item.active {
+        color: #6366f1;
+    }
+    
+    .nav-item:hover {
+        color: #6366f1;
+    }
+    
+    .nav-icon {
+        font-size: 1.2rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .nav-label {
+        font-size: 0.7rem;
+        font-weight: 500;
+    }
+    
+    /* Category grid for Categories page */
+    .category-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .category-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border: 1px solid #e5e7eb;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+    }
+    
+    .category-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .category-image {
+        width: 100%;
+        height: 100px;
+        background: #1f2937;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    
+    .category-name {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #000;
+        margin-bottom: 0.25rem;
+    }
+    
+    .category-count {
+        font-size: 0.8rem;
+        color: #6b7280;
+    }
+    
+    /* Age restriction badge */
+    .age-restricted {
+        background: #ef4444;
+        color: white;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        margin-left: 0.5rem;
+    }
+    
+    /* Stats cards */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1rem;
+        border-radius: 12px;
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 0.25rem;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+        opacity: 0.9;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -272,28 +327,301 @@ st.markdown("""
 def load_data():
     """Load and cache the PLU data"""
     try:
-        # Load the CSV file
         df = pd.read_csv('glide_products.csv')
         return df
     except FileNotFoundError:
         st.error("Please make sure 'glide_products.csv' is in the same directory as this script")
         return pd.DataFrame()
 
-def display_product_card(product):
-    """Display a product card with modern styling"""
-    with st.container():
+def render_product_card(product, show_category_label=True):
+    """Render a product card matching the inventory app style"""
+    age_badge = '<span class="age-restricted">🔞</span>' if product['Age_Restricted'] == 'Yes' else ''
+    category_label = f'<div class="product-category-label">{product["Category"]}</div>' if show_category_label else ''
+    
+    return f"""
+    <div class="product-card">
+        <div class="product-image">
+            <div class="product-dots">⋯</div>
+            <div style="color: #9ca3af; font-size: 2rem;">📦</div>
+        </div>
+        {category_label}
+        <div class="product-name">{product['Product_Name'][:50]}{'...' if len(product['Product_Name']) > 50 else ''}</div>
+        <div class="product-price">{product['Display_Price']}{age_badge}</div>
+    </div>
+    """
+
+def render_category_card(dept_name, count, icon="📦"):
+    """Render a category card for the categories page"""
+    return f"""
+    <div class="category-card">
+        <div class="category-image">
+            <div class="product-dots">⋯</div>
+            <div style="color: #9ca3af; font-size: 3rem;">{icon}</div>
+        </div>
+        <div class="category-name">{dept_name}</div>
+        <div class="category-count">{count} products</div>
+    </div>
+    """
+
+def render_bottom_nav(active_page):
+    """Render bottom navigation"""
+    nav_items = [
+        ("Products", "📦", "products"),
+        ("Orders", "🔄", "orders"),
+        ("Warehouses", "📍", "warehouses"),
+        ("Categories", "📂", "categories"),
+        ("Users", "👥", "users")
+    ]
+    
+    nav_html = '<div class="bottom-nav"><div class="nav-items">'
+    
+    for label, icon, page_key in nav_items:
+        active_class = "active" if active_page == page_key else ""
+        nav_html += f"""
+        <div class="nav-item {active_class}" onclick="setPage('{page_key}')">
+            <div class="nav-icon">{icon}</div>
+            <div class="nav-label">{label}</div>
+        </div>
+        """
+    
+    nav_html += '</div></div>'
+    return nav_html
+
+def products_page(df, search_term=""):
+    """Main products page matching inventory app layout"""
+    
+    # Header with title and add button
+    st.markdown("""
+    <div class="app-header">
+        <h1 class="app-title">Products</h1>
+        <button class="add-button">+ Add Product</button>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Search bar
+    st.markdown("""
+    <div class="search-container">
+        <span style="color: #9ca3af;">🔍</span>
+        <input class="search-input" placeholder="Search" />
+        <span style="color: #9ca3af;">☰</span>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Stats row
+    age_restricted_count = len(df[df['Age_Restricted'] == 'Yes'])
+    dept_count = df['Department_Name'].nunique()
+    
+    st.markdown(f"""
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-number">{len(df):,}</div>
+            <div class="stat-label">Total Products</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{age_restricted_count}</div>
+            <div class="stat-label">Age Restricted</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{dept_count}</div>
+            <div class="stat-label">Departments</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Filter data if search term provided
+    filtered_df = df
+    if search_term:
+        mask = (
+            df['Product_Name'].str.contains(search_term, case=False, na=False) |
+            df['UPC_Code'].astype(str).str.contains(search_term, na=False)
+        )
+        filtered_df = df[mask]
+    
+    # Get top departments
+    top_departments = filtered_df['Department_Name'].value_counts().head(6)
+    
+    # Department icons mapping
+    dept_icons = {
+        'Candy & Snacks': '🍭',
+        'Health & Beauty': '💄',
+        'Food & Grocery': '🥘',
+        'Beverages & Drinks': '🥤',
+        'Tobacco Accessories': '🚬',
+        'Home & Kitchen': '🏠',
+        'Baby & Kids': '👶',
+        'Automotive': '🚗',
+        'Electronics': '📱',
+        'Convenience Items': '🛒'
+    }
+    
+    # Render department sections
+    for dept_name, count in top_departments.items():
+        dept_products = filtered_df[filtered_df['Department_Name'] == dept_name].head(3)
+        
+        if len(dept_products) > 0:
+            # Section header
+            st.markdown(f"""
+            <div class="category-section">
+                <div class="category-header">
+                    <h2 class="category-title">{dept_name}</h2>
+                    <a class="see-all-link">See All ›</a>
+                </div>
+            """, unsafe_allow_html=True)
+            
+            # Products grid
+            products_html = '<div class="products-grid">'
+            for _, product in dept_products.iterrows():
+                products_html += render_product_card(product, show_category_label=True)
+            products_html += '</div></div>'
+            
+            st.markdown(products_html, unsafe_allow_html=True)
+
+def categories_page(df):
+    """Categories page showing department overview"""
+    
+    # Header
+    st.markdown("""
+    <div class="app-header">
+        <h1 class="app-title">Categories</h1>
+        <button class="add-button">+ Add Category</button>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Search bar
+    st.markdown("""
+    <div class="search-container">
+        <span style="color: #9ca3af;">🔍</span>
+        <input class="search-input" placeholder="Search" />
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Get department counts
+    dept_counts = df['Department_Name'].value_counts()
+    
+    # Department icons
+    dept_icons = {
+        'Candy & Snacks': '🍭',
+        'Health & Beauty': '💄',
+        'Food & Grocery': '🥘',
+        'Beverages & Drinks': '🥤',
+        'Tobacco Accessories': '🚬',
+        'Home & Kitchen': '🏠',
+        'Baby & Kids': '👶',
+        'Automotive': '🚗',
+        'Electronics': '📱',
+        'Convenience Items': '🛒'
+    }
+    
+    # Render category grid
+    categories_html = '<div class="category-grid">'
+    
+    for dept_name, count in dept_counts.head(8).items():
+        icon = dept_icons.get(dept_name, '📦')
+        categories_html += render_category_card(dept_name, count, icon)
+    
+    categories_html += '</div>'
+    st.markdown(categories_html, unsafe_allow_html=True)
+
+def warehouses_page():
+    """Warehouses/Stores page"""
+    st.markdown("""
+    <div class="app-header">
+        <h1 class="app-title">Warehouses</h1>
+        <button class="add-button">+ Add Warehouse</button>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Search bar
+    st.markdown("""
+    <div class="search-container">
+        <span style="color: #9ca3af;">🔍</span>
+        <input class="search-input" placeholder="Search" />
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Sample warehouse locations
+    warehouses = [
+        {"name": "Main Distribution Center", "address": "1234 Commerce St, Dallas, TX 75201"},
+        {"name": "North Regional Hub", "address": "5678 Industrial Pkwy, Chicago, IL 60601"},
+        {"name": "West Coast Storage", "address": "9101 Logistics Blvd, Los Angeles, CA 90001"},
+        {"name": "Southeast Warehouse", "address": "2468 Harbor Dr, Atlanta, GA 30301"}
+    ]
+    
+    for warehouse in warehouses:
         st.markdown(f"""
-        <div class="product-card">
-            <div class="product-name">{product['Product_Name']}</div>
-            <div class="product-department">📁 {product['Department_Name']}</div>
-            <div class="product-price">{product['Display_Price']}</div>
-            <div class="product-upc">UPC: {product['UPC_Code']}</div>
-            <div style="margin-top: 0.5rem;">
-                {'<span class="age-restricted">🔞 Age Restricted</span>' if product['Age_Restricted'] == 'Yes' else ''}
-                <span class="stock-status">📦 {product['Stock_Status']}</span>
+        <div class="product-card" style="margin-bottom: 1rem;">
+            <div class="product-name" style="margin-bottom: 0.5rem;">{warehouse['name']}</div>
+            <div class="product-price" style="color: #6b7280;">{warehouse['address']}</div>
+            <div style="text-align: right; margin-top: 0.5rem;">
+                <span style="color: #6b7280;">⋯</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
+
+def users_page():
+    """Users management page"""
+    st.markdown("""
+    <div class="app-header">
+        <h1 class="app-title">Users</h1>
+        <button class="add-button">+ Add User</button>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Search bar
+    st.markdown("""
+    <div class="search-container">
+        <span style="color: #9ca3af;">🔍</span>
+        <input class="search-input" placeholder="Search" />
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Sample users
+    users = [
+        {"name": "Store Manager", "role": "Manager", "email": "manager@store.com"},
+        {"name": "Cashier 1", "role": "Cashier", "email": "cashier1@store.com"},
+        {"name": "Inventory Clerk", "role": "Inventory", "email": "inventory@store.com"},
+        {"name": "Assistant Manager", "role": "Assistant", "email": "assistant@store.com"}
+    ]
+    
+    users_html = '<div class="products-grid">'
+    for user in users:
+        users_html += f"""
+        <div class="product-card" style="text-align: center;">
+            <div style="width: 60px; height: 60px; background: #6366f1; border-radius: 50%; margin: 0 auto 0.5rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">👤</div>
+            <div class="product-name" style="margin-bottom: 0.25rem;">{user['name']}</div>
+            <div class="product-price">{user['role']}</div>
+            <div style="text-align: right; margin-top: 0.5rem;">
+                <span style="color: #6b7280;">⋯</span>
+            </div>
+        </div>
+        """
+    users_html += '</div>'
+    st.markdown(users_html, unsafe_allow_html=True)
+
+def orders_page():
+    """Orders management page"""
+    st.markdown("""
+    <div class="app-header">
+        <h1 class="app-title">Orders</h1>
+        <button class="add-button">+ Add Order</button>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Search bar
+    st.markdown("""
+    <div class="search-container">
+        <span style="color: #9ca3af;">🔍</span>
+        <input class="search-input" placeholder="Search" />
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div style="text-align: center; padding: 3rem; color: #6b7280;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">📋</div>
+        <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">No orders yet</div>
+        <div>Orders will appear here when created</div>
+    </div>
+    """, unsafe_allow_html=True)
 
 def main():
     # Load data
@@ -302,280 +630,65 @@ def main():
     if df.empty:
         st.stop()
     
-    # Mobile-friendly header
-    st.markdown(f"""
-    <div style="text-align: center; margin-bottom: 1rem;">
-        <h1 style="color: #6c5ce7; margin-bottom: 0.5rem;">🛍️ PLU Product Catalog</h1>
-        <p style="color: #636e72; font-size: 0.9rem;">Managing {len(df):,} products across {df['Department_Name'].nunique()} departments</p>
-    </div>
+    # Initialize session state for navigation
+    if 'current_page' not in st.session_state:
+        st.session_state.current_page = 'products'
+    
+    # Handle navigation through query params or buttons
+    query_params = st.query_params
+    if 'page' in query_params:
+        st.session_state.current_page = query_params['page']
+    
+    # Create navigation buttons (hidden, just for functionality)
+    col1, col2, col3, col4, col5 = st.columns(5)
+    with col1:
+        if st.button("Products", key="nav_products"):
+            st.session_state.current_page = 'products'
+    with col2:
+        if st.button("Orders", key="nav_orders"):
+            st.session_state.current_page = 'orders'
+    with col3:
+        if st.button("Warehouses", key="nav_warehouses"):
+            st.session_state.current_page = 'warehouses'
+    with col4:
+        if st.button("Categories", key="nav_categories"):
+            st.session_state.current_page = 'categories'
+    with col5:
+        if st.button("Users", key="nav_users"):
+            st.session_state.current_page = 'users'
+    
+    # Hide the navigation buttons with CSS
+    st.markdown("""
+    <style>
+    .stColumns > div > div > button {
+        display: none;
+    }
+    </style>
     """, unsafe_allow_html=True)
     
-    # Mobile stats row
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.markdown(f"""
-        <div class="stats-card">
-            <div class="stats-number">{len(df):,}</div>
-            <div class="stats-label">Products</div>
-        </div>
-        """, unsafe_allow_html=True)
+    # Render the appropriate page
+    if st.session_state.current_page == 'products':
+        products_page(df)
+    elif st.session_state.current_page == 'categories':
+        categories_page(df)
+    elif st.session_state.current_page == 'warehouses':
+        warehouses_page()
+    elif st.session_state.current_page == 'users':
+        users_page()
+    elif st.session_state.current_page == 'orders':
+        orders_page()
     
-    with col2:
-        age_restricted_count = len(df[df['Age_Restricted'] == 'Yes'])
-        st.markdown(f"""
-        <div class="stats-card">
-            <div class="stats-number">{age_restricted_count}</div>
-            <div class="stats-label">Restricted</div>
-        </div>
-        """, unsafe_allow_html=True)
+    # Render bottom navigation
+    st.markdown(render_bottom_nav(st.session_state.current_page), unsafe_allow_html=True)
     
-    with col3:
-        dept_count = df['Department_Name'].nunique()
-        st.markdown(f"""
-        <div class="stats-card">
-            <div class="stats-number">{dept_count}</div>
-            <div class="stats-label">Categories</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Mobile-optimized search and quick filters
-    st.markdown('<div class="search-container">', unsafe_allow_html=True)
-    search_term = st.text_input("🔍 Search Products", placeholder="Enter product name or UPC...", label_visibility="collapsed")
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Quick filter chips for mobile
-    st.markdown("**Quick Filters:**")
-    quick_filters = st.columns(4)
-    with quick_filters[0]:
-        show_tobacco = st.checkbox("🚬 Tobacco", key="tobacco_filter")
-    with quick_filters[1]:
-        show_candy = st.checkbox("🍭 Candy", key="candy_filter")
-    with quick_filters[2]:
-        show_drinks = st.checkbox("🥤 Drinks", key="drinks_filter")
-    with quick_filters[3]:
-        show_restricted = st.checkbox("🔞 Restricted", key="restricted_filter")
-    
-    # Mobile-optimized sidebar filters
-    with st.sidebar:
-        st.markdown('<div class="sidebar-header">🔍 Advanced Filters</div>', unsafe_allow_html=True)
-        
-        # Collapsible sections for mobile
-        with st.expander("📂 Department & Category", expanded=False):
-            # Department filter
-            departments = ['All Departments'] + sorted(df['Department_Name'].unique().tolist())
-            selected_department = st.selectbox("Department", departments)
-            
-            # Category filter
-            categories = ['All Categories'] + sorted(df['Category'].unique().tolist())
-            selected_category = st.selectbox("Category", categories)
-        
-        with st.expander("💰 Price & Stock", expanded=False):
-            # Price range filter
-            min_price, max_price = st.slider(
-                "Price Range",
-                min_value=float(df['Price_Numeric'].min()),
-                max_value=float(df['Price_Numeric'].max()),
-                value=(float(df['Price_Numeric'].min()), float(df['Price_Numeric'].max())),
-                format="$%.2f"
-            )
-            
-            # Stock status filter
-            stock_filter = st.selectbox("Stock Status", ['All Status'] + df['Stock_Status'].unique().tolist())
-        
-        with st.expander("🔞 Age Restrictions", expanded=False):
-            # Age restriction filter
-            age_filter = st.selectbox("Age Restriction", ['All Products', 'Age Restricted Only', 'No Age Restriction'])
-        
-        st.markdown("---")
-        
-        # Mobile-friendly quick stats
-        st.markdown("### 📊 Top Departments")
-        dept_counts = df['Department_Name'].value_counts().head(3)
-        for dept, count in dept_counts.items():
-            st.markdown(f"**{dept[:20]}{'...' if len(dept) > 20 else ''}**: {count}")
-    
-    # Apply quick filters
-    filtered_df = df.copy()
-    
-    if show_tobacco:
-        filtered_df = filtered_df[filtered_df['Category'].str.contains('Tobacco', case=False, na=False)]
-    if show_candy:
-        filtered_df = filtered_df[filtered_df['Department_Name'].str.contains('Candy', case=False, na=False)]
-    if show_drinks:
-        filtered_df = filtered_df[filtered_df['Department_Name'].str.contains('Beverage|Drink', case=False, na=False)]
-    if show_restricted:
-        filtered_df = filtered_df[filtered_df['Age_Restricted'] == 'Yes']
-    
-    # Search filter
-    if search_term:
-        search_mask = (
-            filtered_df['Product_Name'].str.contains(search_term, case=False, na=False) |
-            filtered_df['UPC_Code'].astype(str).str.contains(search_term, na=False) |
-            filtered_df['Search_Terms'].str.contains(search_term, case=False, na=False)
-        )
-        filtered_df = filtered_df[search_mask]
-    
-    # Department filter
-    if selected_department != 'All Departments':
-        filtered_df = filtered_df[filtered_df['Department_Name'] == selected_department]
-    
-    # Category filter
-    if selected_category != 'All Categories':
-        filtered_df = filtered_df[filtered_df['Category'] == selected_category]
-    
-    # Price filter
-    filtered_df = filtered_df[
-        (filtered_df['Price_Numeric'] >= min_price) & 
-        (filtered_df['Price_Numeric'] <= max_price)
-    ]
-    
-    # Age restriction filter
-    if age_filter == 'Age Restricted Only':
-        filtered_df = filtered_df[filtered_df['Age_Restricted'] == 'Yes']
-    elif age_filter == 'No Age Restriction':
-        filtered_df = filtered_df[filtered_df['Age_Restricted'] == 'No']
-    
-    # Stock status filter
-    if stock_filter != 'All Status':
-        filtered_df = filtered_df[filtered_df['Stock_Status'] == stock_filter]
-    
-    # Display results count with mobile-friendly layout
-    st.markdown(f"### 📦 Products ({len(filtered_df):,} found)")
-    
-    # Mobile-optimized view and sort options
-    col1, col2 = st.columns(2)
-    with col1:
-        # View options with mobile-friendly names
-        view_mode = st.selectbox("View", ['🃏 Cards', '📋 List', '📂 Categories'], key="view_mode")
-    with col2:
-        # Sort options
-        sort_options = {
-            'Name A→Z': ['Product_Name', True],
-            'Name Z→A': ['Product_Name', False],
-            'Price ↑': ['Price_Numeric', True],
-            'Price ↓': ['Price_Numeric', False],
-            'Department': ['Department_Name', True]
-        }
-        sort_choice = st.selectbox("Sort", list(sort_options.keys()), key="sort_choice")
-        sort_col, sort_asc = sort_options[sort_choice]
-        filtered_df = filtered_df.sort_values(sort_col, ascending=sort_asc)
-    
-    # Display products based on view mode
-    if len(filtered_df) == 0:
-        st.warning("No products found matching your criteria. Try adjusting your filters.")
-    else:
-        if view_mode == '🃏 Cards':
-            # Mobile-optimized card view - 2 columns on mobile, 3 on desktop
-            cols = st.columns(2)  # Better for mobile
-            
-            display_limit = 20  # Reduced for mobile performance
-            for idx, (_, product) in enumerate(filtered_df.head(display_limit).iterrows()):
-                with cols[idx % len(cols)]:
-                    display_product_card(product)
-            
-            if len(filtered_df) > display_limit:
-                if st.button(f"📱 Load More ({len(filtered_df) - display_limit} remaining)", use_container_width=True):
-                    st.rerun()
-        
-        elif view_mode == '📋 List':
-            # Mobile-optimized table view
-            display_cols = ['Product_Name', 'Display_Price', 'Department_Name', 'Age_Restricted']
-            mobile_df = filtered_df[display_cols].head(50)
-            mobile_df.columns = ['Product', 'Price', 'Department', 'Age Check']
-            st.dataframe(
-                mobile_df,
-                use_container_width=True,
-                hide_index=True,
-                height=400
-            )
-        
-        elif view_mode == '📂 Categories':
-            # Mobile-optimized category view
-            departments = filtered_df['Department_Name'].unique()
-            for dept in sorted(departments):
-                dept_products = filtered_df[filtered_df['Department_Name'] == dept]
-                
-                st.markdown(f'<div class="category-header">{dept} ({len(dept_products)})</div>', 
-                           unsafe_allow_html=True)
-                
-                # Show fewer products per category on mobile
-                cols = st.columns(2)  # Mobile-friendly 2 columns
-                for idx, (_, product) in enumerate(dept_products.head(4).iterrows()):
-                    with cols[idx % 2]:
-                        display_product_card(product)
-                
-                if len(dept_products) > 4:
-                    with st.expander(f"📱 Show all {len(dept_products)} in {dept}"):
-                        remaining_cols = st.columns(2)
-                        for idx, (_, product) in enumerate(dept_products.iloc[4:12].iterrows()):  # Limit for performance
-                            with remaining_cols[idx % 2]:
-                                display_product_card(product)
-                        if len(dept_products) > 12:
-                            st.info(f"💡 {len(dept_products) - 12} more products available. Use search to find specific items.")
-    
-    # Mobile-optimized analytics section
-    if not filtered_df.empty and len(filtered_df) > 10:  # Only show analytics if enough data
-        with st.expander("📈 Analytics Dashboard", expanded=False):
-            
-            # Single column layout for mobile
-            # Department distribution - horizontal bar for mobile readability
-            dept_counts = filtered_df['Department_Name'].value_counts().head(8)
-            fig_dept = px.bar(
-                x=dept_counts.values,
-                y=[name[:20] + '...' if len(name) > 20 else name for name in dept_counts.index],
-                orientation='h',
-                title="Top Departments",
-                labels={'x': 'Products', 'y': 'Department'},
-                height=300
-            )
-            fig_dept.update_layout(
-                font_size=10,
-                title_font_size=14,
-                margin=dict(l=10, r=10, t=30, b=10)
-            )
-            st.plotly_chart(fig_dept, use_container_width=True)
-            
-            # Price distribution - simplified
-            fig_price = px.histogram(
-                filtered_df,
-                x='Price_Numeric',
-                nbins=15,
-                title="Price Distribution",
-                labels={'Price_Numeric': 'Price ($)', 'count': 'Products'},
-                height=250
-            )
-            fig_price.update_layout(
-                font_size=10,
-                title_font_size=14,
-                margin=dict(l=10, r=10, t=30, b=10)
-            )
-            st.plotly_chart(fig_price, use_container_width=True)
-            
-            # Quick stats in mobile-friendly format
-            col1, col2 = st.columns(2)
-            with col1:
-                avg_price = filtered_df['Price_Numeric'].mean()
-                st.metric("Avg Price", f"${avg_price:.2f}")
-            with col2:
-                max_price = filtered_df['Price_Numeric'].max()
-                st.metric("Max Price", f"${max_price:.2f}")
-            
-            # Age restriction pie chart - smaller for mobile
-            if 'Age_Restricted' in filtered_df.columns:
-                age_dist = filtered_df['Age_Restricted'].value_counts()
-                if len(age_dist) > 1:
-                    fig_age = px.pie(
-                        values=age_dist.values,
-                        names=age_dist.index,
-                        title="Age Restrictions",
-                        height=250
-                    )
-                    fig_age.update_layout(
-                        font_size=10,
-                        title_font_size=14,
-                        margin=dict(l=10, r=10, t=30, b=10)
-                    )
-                    st.plotly_chart(fig_age, use_container_width=True)
+    # JavaScript for navigation (this won't work in Streamlit Cloud, but shows the concept)
+    st.markdown("""
+    <script>
+    function setPage(page) {
+        window.location.href = window.location.pathname + '?page=' + page;
+    }
+    </script>
+    """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
