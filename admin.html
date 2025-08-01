@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kirmani's Admin Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .header-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .header-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            opacity: 0.8;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .trend-up {
+            color: #28a745;
+        }
+
+        .trend-down {
+            color: #dc3545;
+        }
+
+        /* Content Sections */
+        .content-section {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        /* Data Tables */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9rem;
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-urgent {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Message Broadcast */
+        .message-form {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        /* Filters */
+        .filters-bar {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-select {
+            padding: 0.5rem;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            background: white;
+            min-width: 150px;
+        }
+
+        /* Success Toast */
+        .toast {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: #28a745;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        /* Charts Placeholder */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-placeholder {
+            height: 250px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 1rem;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .filters-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                justify-content: space-between;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <h1>👨‍💼 Kirmani's Admin Portal</h1>
+            <div class="header-actions">
+                <span>📅 December 15, 2024</span>
+                <button class="header-btn">⚙️ Settings</button>
+                <button class="header-btn">👤 Admin</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">🏪</div>
+                </div>
+                <div class="stat-value">30</div>
+                <div class="stat-label">Active Gas Stations</div>
+                <div class="stat-trend trend-up">
+                    ↗️ All stations operational
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">📊</div>
+                </div>
+                <div class="stat-value">$127,450</div>
+                <div class="stat-label">Today's Total Sales</div>
+                <div class="stat-trend trend-up">
+                    ↗️ +15% vs yesterday
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">⛽</div>
+                </div>
+                <div class="stat-value">45,230</div>
+                <div class="stat-label">Gallons Sold Today</div>
+                <div class="stat-trend trend-up">
+                    ↗️ +8% vs yesterday
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon">📝</div>
+                </div>
+                <div class="stat-value">7</div>
+                <div class="stat-label">Pending Requests</div>
+                <div class="stat-trend trend-down">
+                    ↘️ 3 completed today
+                </div>
+            </div>
+        </div>
+
+        <!-- Broadcast Message Section -->
+        <div class="content-section">
+            <div class="section-header">
+                <div class="section-title">
+                    📢 Broadcast Message to All Stations
+                </div>
+            </div>
+            <div class="message-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Message Content</label>
+                        <textarea class="form-textarea" placeholder="Type your message to all 30 gas station employees..." id="messageContent"></textarea>
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <label class="form-label">Message Type</label>
+                            <select class="form-select" id="messageType">
+                                <option value="info">📋 Information</option>
+                                <option value="warning">⚠️ Warning</option>
+                                <option value="urgent">🚨 Urgent</option>
+                                <option value="success">✅ Update</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Expires After</label>
+                            <select class="form-select" id="messageExpiry">
+                                <option>Never</option>
+                                <option>1 hour</option>
+                                <option>4 hours</option>
+                                <option>24 hours</option>
+                                <option>1 week</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="sendMessage()" style="width: 100%; margin-top: 1rem;">
+                            📤 Send to All Stations
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Reports Section -->
+        <div class="content-section">
+            <div class="section-header">
+                <div class="section-title">
+                    📊 Today's Station Reports
+                </div>
+                <div class="section-actions">
+                    <button class="btn btn-primary" onclick="exportData()">📥 Export Data</button>
+                    <button class="btn btn-primary" onclick="refreshData()">🔄 Refresh</button>
+                </div>
+            </div>
+            
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <label><strong>Filter by Station:</strong></label>
+                    <select class="filter-select" id="stationFilter">
+                        <option>All Stations</option>
+                        <option>Main Street Station</option>
+                        <option>Highway 95 Station</option>
+                        <option>Downtown Station</option>
+                        <option>Airport Road Station</option>
+                        <option>Mall Plaza Station</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label><strong>Date:</strong></label>
+                    <input type="date" class="filter-select" value="2024-12-15" id="dateFilter">
+                </div>
+                <div class="filter-group">
+                    <label><strong>Sort by:</strong></label>
+                    <select class="filter-select" id="sortFilter">
+                        <option>Sales (High to Low)</option>
+                        <option>Sales (Low to High)</option>
+                        <option>Gallons Sold</option>
+                        <option>Station Name</option>
+                        <option>Time Submitted</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>🏪 Station Name</th>
+                            <th>💰 Merch Sales</th>
+                            <th>⛽ Gallons Sold</th>
+                            <th>💵 Gas Prices (R/P/S/D)</th>
+                            <th>⏰ Submitted At</th>
+                            <th>📊 Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Main Street Station</strong></td>
+                            <td><strong>$4,250.00</strong></td>
+                            <td><strong>1,680 gal</strong></td>
+                            <td>$3.45 / $3.65 / $3.85 / $3.95</td>
+                            <td>8:45 AM</td>
+                            <td><span class="status-badge status-completed">✅ Complete</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Highway 95 Station</strong></td>
+                            <td><strong>$6,180.00</strong></td>
+                            <td><strong>2,340 gal</strong></td>
+                            <td>$3.47 / $3.67 / $3.87 / $3.97</td>
+                            <td>9:15 AM</td>
+                            <td><span class="status-badge status-completed">✅ Complete</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Downtown Station</strong></td>
+                            <td><strong>$3,890.00</strong></td>
+                            <td><strong>1,450 gal</strong></td>
+                            <td>$3.44 / $3.64 / $3.84 / $3.94</td>
+                            <td>7:30 AM</td>
+                            <td><span class="status-badge status-completed">✅ Complete</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Airport Road Station</strong></td>
+                            <td><strong>$5,320.00</strong></td>
+                            <td><strong>1,980 gal</strong></td>
+                            <td>$3.46 / $3.66 / $3.86 / $3.96</td>
+                            <td>8:20 AM</td>
+                            <td><span class="status-badge status-completed">✅ Complete</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mall Plaza Station</strong></td>
+                            <td><em>Not submitted</em></td>
+                            <td><em>Not submitted</em></td>
+                            <td><em>Not submitted</em></td>
+                            <td>-</td>
+                            <td><span class="status-badge status-pending">⏳ Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Industrial Station</strong></td>
+                            <td><strong>$2,890.00</strong></td>
+                            <td><strong>1,120 gal</strong></td>
+                            <td>$3.43 / $3.63 / $3.83 / $3.93</td>
+                            <td>10:05 AM</td>
+                            <td><span class="status-badge status-completed">✅ Complete</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Request Management Section -->
+        <div class="content-section">
+            <div class="section-header">
+                <div class="section-title">
+                    📝 Employee Requests Management
+                </div>
+                <div class="section-actions">
+                    <button class="btn btn-primary">📋 View All Requests</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>🆔 Request ID</th>
+                            <th>👤 Employee</th>
+                            <th>🏪 Station</th>
+                            <th>📋 Type</th>
+                            <th>📄 Description</th>
+                            <th>⚡ Priority</th>
+                            <th>📅 Date</th>
+                            <th>⚙️ Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>#247</strong></td>
+                            <td>Sarah Johnson</td>
+                            <td>Main Street Station</td>
+                            <td>Business Checks</td>
+                            <td>Need checks for ABC Company payment</td>
+                            <td><span class="status-badge status-urgent">🚨 Urgent</span></td>
+                            <td>2 hours ago</td>
+                            <td><button class="btn btn-success" onclick="completeRequest(247)">✅ Complete</button></td>
+                        </tr>
+                        <tr>
+                            <td><strong>#246</strong></td>
+                            <td>Mike Rodriguez</td>
+                            <td>Highway 95 Station</td>
+                            <td>Maintenance</td>
+                            <td>Bathroom light not working</td>
+                            <td><span class="status-badge status-pending">⏳ Normal</span></td>
+                            <td>4 hours ago</td>
+                            <td><button class="btn btn-success" onclick="completeRequest(246)">✅ Complete</button></td>
+                        </tr>
+                        <tr>
+                            <td><strong>#245</strong></td>
+                            <td>Lisa Chen</td>
+                            <td>Downtown Station</td>
+                            <td>Office Supplies</td>
+                            <td>Need more receipt paper rolls</td>
+                            <td><span class="status-badge status-pending">⏳ Normal</span></td>
+                            <td>6 hours ago</td>
+                            <td><button class="btn btn-success" onclick="completeRequest(245)">✅ Complete</button></td>
+                        </tr>
+                        <tr>
+                            <td><strong>#244</strong></td>
+                            <td>David Kim</td>
+                            <td>Airport Road Station</td>
+                            <td>Equipment Repair</td>
+                            <td>Cash register drawer sticking</td>
+                            <td><span class="status-badge status-urgent">🚨 Urgent</span></td>
+                            <td>1 day ago</td>
+                            <td><button class="btn btn-success" onclick="completeRequest(244)">✅ Complete</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Analytics Charts -->
+        <div class="charts-container">
+            <div class="chart-card">
+                <div class="chart-title">📈 Daily Sales Trend (Last 7 Days)</div>
+                <div class="chart-placeholder">
+                    Interactive sales chart would display here<br>
+                    <small>📊 Shows daily revenue trends across all stations<br>
+                    Integration with Chart.js or D3.js recommended</small>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-title">⛽ Fuel Sales by Station</div>
+                <div class="chart-placeholder">
+                    Bar chart comparing fuel sales would display here<br>
+                    <small>📊 Compare gallons sold per station<br>
+                    Real-time data visualization</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div id="toast" class="toast">
+        <div id="toast-message">Action completed successfully!</div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            const messageContent = document.getElementById('messageContent').value;
+            const messageType = document.getElementById('messageType').value;
+            const messageExpiry = document.getElementById('messageExpiry').value;
+            
+            if (!messageContent.trim()) {
+                alert('Please enter a message before sending.');
+                return;
+            }
+            
+            // Show success toast
+            showToast('📤 Message sent to all 30 gas stations!');
+            
+            // Clear the form
+            document.getElementById('messageContent').value = '';
+            
+            // In real app, this would send data to backend API
+            console.log('Broadcasting message:', { messageContent, messageType, messageExpiry });
+        }
+
+        function completeRequest(requestId) {
+            // Show success toast
+            showToast(`✅ Request #${requestId} marked as completed!`);
+            
+            // Update the UI to show completed status
+            const button = event.target;
+            const row = button.closest('tr');
+            const actionCell = row.cells[7];
+            actionCell.innerHTML = '<span class="status-badge status-completed">✅ Completed</span>';
+            
+            // In real app, this would update the database
+            console.log(`Completing request ${requestId}...`);
+        }
+
+        function exportData() {
+            showToast('📥 Data export started! Download will begin shortly.');
+            // In real app, this would generate and download Excel/CSV file
+            console.log('Exporting daily reports data...');
+        }
+
+        function refreshData() {
+            showToast('🔄 Data refreshed successfully!');
+            // In real app, this would fetch latest data from API
+            console.log('Refreshing dashboard data...');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Auto-refresh data every 30 seconds (in real app)
+        setInterval(() => {
+            console.log('Auto-refreshing dashboard data...');
+            // In real app, this would fetch latest data from backend
+        }, 30000);
+
+        // Add interactivity to filters
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners to filters
+            document.getElementById('stationFilter').addEventListener('change', function() {
+                console.log('Station filter changed:', this.value);
+                // In real app, this would filter the table data
+            });
+            
+            document.getElementById('dateFilter').addEventListener('change', function() {
+                console.log('Date filter changed:', this.value);
+                // In real app, this would fetch data for selected date
+            });
+            
+            document.getElementById('sortFilter').addEventListener('change', function() {
+                console.log('Sort changed:', this.value);
+                // In real app, this would sort the table data
+            });
+
+            // Add hover effects to table rows
+            const rows = document.querySelectorAll('.data-table tbody tr');
+            rows.forEach(row => {
+                row.addEventListener('click', function() {
+                    console.log('Row clicked - could show detailed view');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

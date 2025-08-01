@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kirmani's Employee App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .app-container {
+            max-width: 414px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            min-height: 100vh;
+            box-shadow: 0 0 30px rgba(0,0,0,0.3);
+        }
+
+        /* Station Selection Page */
+        .station-selection {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .welcome-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .welcome-card h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .welcome-card p {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .dropdown-group {
+            margin: 2rem 0;
+        }
+
+        .dropdown-label {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        .station-select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .station-select option {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem;
+        }
+
+        .continue-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .continue-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .continue-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Main App Pages */
+        .page {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+
+        .station-info {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+            margin-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .station-name {
+            font-weight: 600;
+        }
+
+        .change-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.4rem 0.8rem;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .status-bar {
+            background: #fff;
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #28a745;
+        }
+
+        .alert {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            margin: 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #856404;
+        }
+
+        .main-menu {
+            padding: 1.5rem;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .menu-item {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 2px solid transparent;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            border-color: #667eea;
+        }
+
+        .menu-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .menu-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .menu-description {
+            color: #6c757d;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .page-header {
+            background: white;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .page-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .form-container {
+            padding: 1.5rem;
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 1.2rem 2rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        }
+
+        .scanner-area {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .scanner-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .scanner-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-top: 1rem;
+            cursor: pointer;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 414px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-top: 1px solid #e9ecef;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-around;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .nav-item.active {
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .nav-icon {
+            font-size: 1.4rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .nav-label {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #6c757d;
+        }
+
+        .nav-item.active .nav-label {
+            color: #667eea;
+        }
+
+        @media (max-width: 480px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Station Selection Page -->
+        <div id="station-selection" class="page active">
+            <div class="station-selection">
+                <div class="welcome-card">
+                    <h1>🏪 Kirmani's</h1>
+                    <p>Employee Portal</p>
+                    
+                    <div class="dropdown-group">
+                        <div class="dropdown-label">Select Your Station:</div>
+                        <select class="station-select" id="stationSelect">
+                            <option value="">Choose your station...</option>
+                            <option value="KSK Auto Group">🚗 KSK Auto Group</option>
+                            <option value="ONE STOP INC">⛽ ONE STOP INC</option>
+                            <option value="SYED Empires">🏢 SYED Empires</option>
+                            <option value="S. Micheal">🌟 S. Micheal</option>
+                            <option value="Verbank">🏪 Verbank</option>
+                        </select>
+                    </div>
+
+                    <button class="continue-btn" id="continueBtn" onclick="selectStation()" disabled>
+                        Continue to Dashboard
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Menu Page -->
+        <div id="main-menu" class="page">
+            <div class="header">
+                <h1>🏪 Kirmani's Gas Station</h1>
+                <p>Employee Dashboard</p>
+                <div class="station-info">
+                    <div class="station-name" id="selectedStation">No Station Selected</div>
+                    <button class="change-btn" onclick="showPage('station-selection')">Change</button>
+                </div>
+            </div>
+
+            <div class="status-bar">
+                <div class="status-item">
+                    <div class="status-dot"></div>
+                    <span>Online</span>
+                </div>
+                <div class="status-item">
+                    <span>📅 Today</span>
+                </div>
+            </div>
+
+            <div class="alert">
+                ⚠️ <strong>Reminder:</strong> Submit daily report before shift ends
+            </div>
+
+            <div class="main-menu">
+                <div class="menu-grid">
+                    <div class="menu-item" onclick="showPage('daily-entry')">
+                        <span class="menu-icon">📊</span>
+                        <div class="menu-title">Daily Data Entry</div>
+                        <div class="menu-description">Enter sales, gallons, and gas prices</div>
+                    </div>
+
+                    <div class="menu-item" onclick="showPage('product-search')">
+                        <span class="menu-icon">🔍</span>
+                        <div class="menu-title">Product Search</div>
+                        <div class="menu-description">Scan barcodes and search products</div>
+                    </div>
+
+                    <div class="menu-item" onclick="showPage('submit-request')">
+                        <span class="menu-icon">📝</span>
+                        <div class="menu-title">Submit Request</div>
+                        <div class="menu-description">Request supplies or report issues</div>
+                    </div>
+
+                    <div class="menu-item" onclick="showPage('messages')">
+                        <span class="menu-icon">💬</span>
+                        <div class="menu-title">Messages</div>
+                        <div class="menu-description">View company announcements</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Data Entry Page -->
+        <div id="daily-entry" class="page">
+            <div class="page-header">
+                <button class="back-btn" onclick="showPage('main-menu')">← Back</button>
+                <div class="page-title">Daily Data Entry</div>
+            </div>
+
+            <div class="form-container">
+                <div class="form-section">
+                    <div class="section-title">📊 Merchandise Sales</div>
+                    <div class="form-group">
+                        <label class="form-label">Total Merchandise Sales ($)</label>
+                        <input type="number" class="form-input" placeholder="2,450.00" step="0.01">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">⛽ Fuel Data</div>
+                    <div class="form-group">
+                        <label class="form-label">Total Gallons Sold</label>
+                        <input type="number" class="form-input" placeholder="3,250">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Gas Prices</label>
+                        <div class="form-row">
+                            <input type="number" class="form-input" placeholder="Regular: $3.45" step="0.01">
+                            <input type="number" class="form-input" placeholder="Plus: $3.65" step="0.01">
+                        </div>
+                        <div class="form-row" style="margin-top: 1rem;">
+                            <input type="number" class="form-input" placeholder="Super: $3.85" step="0.01">
+                            <input type="number" class="form-input" placeholder="Diesel: $3.95" step="0.01">
+                        </div>
+                    </div>
+                </div>
+
+                <button class="submit-btn" onclick="submitDailyReport()">
+                    📊 Submit Daily Report
+                </button>
+            </div>
+        </div>
+
+        <!-- Product Search Page -->
+        <div id="product-search" class="page">
+            <div class="page-header">
+                <button class="back-btn" onclick="showPage('main-menu')">← Back</button>
+                <div class="page-title">Product Search</div>
+            </div>
+
+            <div class="form-container">
+                <div class="scanner-area">
+                    <div class="scanner-icon">📱</div>
+                    <div><strong>Barcode Scanner</strong><br>Point camera at barcode</div>
+                    <button class="scanner-btn" onclick="startScanner()">📷 Start Camera</button>
+                </div>
+
+                <div class="form-section">
+                    <div class="form-group">
+                        <label class="form-label">🔍 Manual Search</label>
+                        <input type="text" class="form-input" placeholder="Enter product name or UPC code...">
+                    </div>
+                    <button class="submit-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        🔍 Search Products
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Request Page -->
+        <div id="submit-request" class="page">
+            <div class="page-header">
+                <button class="back-btn" onclick="showPage('main-menu')">← Back</button>
+                <div class="page-title">Submit Request</div>
+            </div>
+
+            <div class="form-container">
+                <div class="form-section">
+                    <div class="section-title">📝 Request Details</div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">👤 Your Name</label>
+                        <input type="text" class="form-input" placeholder="Enter your full name">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">📋 Request Type</label>
+                            <select class="form-input">
+                                <option>Business Checks</option>
+                                <option>Office Supplies</option>
+                                <option>Maintenance Issue</option>
+                                <option>Equipment Repair</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">⚡ Priority</label>
+                            <select class="form-input">
+                                <option>Normal</option>
+                                <option>Urgent</option>
+                                <option>Low</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">📌 Request Title</label>
+                        <input type="text" class="form-input" placeholder="Brief description">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">📄 Description</label>
+                        <textarea class="form-input" rows="4" placeholder="Detailed information..."></textarea>
+                    </div>
+
+                    <button class="submit-btn" onclick="submitRequest()">
+                        🚀 Submit Request
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages Page -->
+        <div id="messages" class="page">
+            <div class="page-header">
+                <button class="back-btn" onclick="showPage('main-menu')">← Back</button>
+                <div class="page-title">Messages</div>
+            </div>
+
+            <div class="form-container">
+                <div class="alert" style="background: #f8d7da; border-left-color: #dc3545; color: #721c24;">
+                    🚨 <strong>URGENT:</strong> New safety protocols effective immediately
+                </div>
+                
+                <div class="alert">
+                    ℹ️ <strong>INFO:</strong> Meeting moved to Friday 2 PM
+                </div>
+
+                <div class="form-section">
+                    <div style="text-align: center; color: #6c757d; padding: 2rem;">
+                        📬 All messages up to date<br>
+                        <small>Check back regularly</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="showPage('main-menu')">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-label">Home</div>
+            </div>
+            <div class="nav-item" onclick="showPage('daily-entry')">
+                <div class="nav-icon">📊</div>
+                <div class="nav-label">Data</div>
+            </div>
+            <div class="nav-item" onclick="showPage('product-search')">
+                <div class="nav-icon">🔍</div>
+                <div class="nav-label">Search</div>
+            </div>
+            <div class="nav-item" onclick="showPage('submit-request')">
+                <div class="nav-icon">📝</div>
+                <div class="nav-label">Request</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedStation = null;
+
+        // Enable continue button when station is selected
+        document.getElementById('stationSelect').addEventListener('change', function() {
+            const continueBtn = document.getElementById('continueBtn');
+            if (this.value) {
+                continueBtn.disabled = false;
+                continueBtn.style.opacity = '1';
+            } else {
+                continueBtn.disabled = true;
+                continueBtn.style.opacity = '0.5';
+            }
+        });
+
+        function selectStation() {
+            const stationSelect = document.getElementById('stationSelect');
+            const stationName = stationSelect.value;
+            
+            if (!stationName) {
+                alert('Please select a station first');
+                return;
+            }
+            
+            selectedStation = stationName;
+            document.getElementById('selectedStation').textContent = stationName;
+            
+            // Show success message
+            alert('✅ Station selected: ' + stationName);
+            
+            // Navigate to main menu
+            showPage('main-menu');
+        }
+
+        function showPage(pageId) {
+            // Hide all pages
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Update navigation
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Set active nav item
+            const navMap = {
+                'main-menu': 0,
+                'daily-entry': 1,
+                'product-search': 2,
+                'submit-request': 3
+            };
+            
+            if (navMap[pageId] !== undefined) {
+                navItems[navMap[pageId]].classList.add('active');
+            }
+            
+            // Reset station selection if going back
+            if (pageId === 'station-selection') {
+                selectedStation = null;
+                document.getElementById('stationSelect').value = '';
+                document.getElementById('continueBtn').disabled = true;
+                document.getElementById('continueBtn').style.opacity = '0.5';
+            }
+        }
+
+        function submitDailyReport() {
+            if (!selectedStation) {
+                alert('Please select a station first');
+                showPage('station-selection');
+                return;
+            }
+            
+            alert('✅ Daily report submitted for ' + selectedStation);
+            showPage('main-menu');
+        }
+
+        function submitRequest() {
+            if (!selectedStation) {
+                alert('Please select a station first');
+                showPage('station-selection');
+                return;
+            }
+            
+            alert('✅ Request submitted for ' + selectedStation);
+            showPage('main-menu');
+        }
+
+        function startScanner() {
+            alert('📷 Camera scanner would start here!');
+        }
+    </script>
+</body>
+</html>

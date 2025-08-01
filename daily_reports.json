@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "station": "\ud83d\ude97 KSK Auto Group",
+    "date": "2025-08-01",
+    "time_submitted": "06:41:34",
+    "merch_sales": 2500.0,
+    "gallons_sold": 2555,
+    "gas_prices": {
+      "regular": 2255.0,
+      "plus": 2525.0,
+      "super": 255.0,
+      "diesel": 2552.0
+    },
+    "submitted_at": "2025-08-01T06:41:34.235773"
+  }
+]
