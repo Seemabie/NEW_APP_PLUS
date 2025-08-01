@@ -27,7 +27,7 @@ GAS_STATIONS = [
     "🏪 Verbank"
 ]
 
-# Custom CSS matching the HTML design
+# UPDATED CSS - MATCHING NEW HTML DESIGN
 st.markdown("""
 <style>
     /* Hide Streamlit default elements */
@@ -45,7 +45,7 @@ st.markdown("""
         min-height: 100vh;
     }
     
-    /* Station selection styling */
+    /* Station selection styling - COMPLETELY UPDATED */
     .station-selection {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
@@ -55,23 +55,46 @@ st.markdown("""
         display: flex;
         flex-direction: column;
         justify-content: center;
+        align-items: center;
     }
     
     .welcome-card {
         background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(20px);
         border-radius: 20px;
-        padding: 3rem 2rem;
+        padding: 2rem;
         border: 1px solid rgba(255, 255, 255, 0.2);
-        margin: 0 auto;
+        margin-bottom: 2rem;
         max-width: 350px;
+        width: 100%;
     }
     
-    .welcome-title {
-        font-size: 2rem;
+    /* SMALL ICON - NEW */
+    .company-icon {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+        opacity: 0.8;
+    }
+    
+    .company-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+    }
+    
+    .company-subtitle {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+    
+    /* BIG STATION SELECTION TITLE - NEW */
+    .station-selection-main-title {
+        font-size: 2.2rem;
         font-weight: 800;
-        margin-bottom: 1rem;
+        margin: 2rem 0;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        color: white;
+        text-align: center;
     }
     
     /* Header styling */
@@ -145,50 +168,67 @@ st.markdown("""
         color: #721c24;
     }
     
-    /* Menu items */
+    /* SQUARE MENU ITEMS - UPDATED */
+    .main-menu {
+        padding: 1.5rem;
+    }
+    
+    .menu-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+    
     .menu-item {
         background: white;
-        border-radius: 16px;
-        padding: 2rem;
+        border-radius: 20px;
+        padding: 1.5rem;
         text-align: center;
-        margin: 1rem;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        border: 2px solid transparent;
+        cursor: pointer;
         transition: all 0.3s ease;
+        box-shadow: 0 6px 25px rgba(0,0,0,0.1);
+        border: 2px solid transparent;
+        aspect-ratio: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
     
     .menu-item:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        transform: translateY(-8px);
+        box-shadow: 0 15px 45px rgba(0,0,0,0.2);
         border-color: #667eea;
     }
     
     .menu-icon {
-        font-size: 3rem;
+        font-size: 2.5rem;
         margin-bottom: 1rem;
         display: block;
     }
     
     .menu-title {
-        font-size: 1.2rem;
+        font-size: 1rem;
         font-weight: 700;
         color: #2c3e50;
         margin-bottom: 0.5rem;
+        line-height: 1.2;
     }
     
     .menu-description {
         color: #6c757d;
-        font-size: 0.9rem;
-        line-height: 1.4;
+        font-size: 0.75rem;
+        line-height: 1.3;
     }
     
     /* Form styling */
     .form-section {
         background: white;
-        border-radius: 16px;
+        border-radius: 20px;
         padding: 2rem;
         margin: 1rem;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border: 1px solid #e9ecef;
     }
     
     .section-title {
@@ -198,19 +238,22 @@ st.markdown("""
         margin-bottom: 1.5rem;
     }
     
-    /* Scanner area */
-    .scanner-area {
-        background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-        border-radius: 16px;
+    /* BIG SEARCH BAR - NEW */
+    .search-main-container {
         padding: 2rem;
+        background: white;
+        margin: 1.5rem;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         text-align: center;
-        color: white;
-        margin: 1rem;
     }
     
-    .scanner-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
+    .big-search-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 2rem;
+        text-align: center;
     }
     
     /* Results styling */
@@ -265,27 +308,77 @@ st.markdown("""
         font-weight: 600;
     }
     
-    /* Hide streamlit widgets styling */
+    /* Enhanced Streamlit widgets styling */
     .stSelectbox > div > div {
-        background: rgba(255, 255, 255, 0.2);
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.15);
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        border-radius: 15px;
         color: white;
+        padding: 1.2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+    }
+    
+    .stSelectbox > div > div:focus {
+        border-color: rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.25);
     }
     
     .stButton > button {
-        background: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.25);
         color: white;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-radius: 25px;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        border-radius: 30px;
         width: 100%;
-        padding: 1rem 2rem;
+        padding: 1.2rem 2.5rem;
         font-weight: 700;
+        font-size: 1.1rem;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
     }
     
     .stButton > button:hover {
-        background: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.35);
         border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+    
+    .stButton > button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    /* Enhanced text input */
+    .stTextInput > div > div > input {
+        border: 3px solid #667eea;
+        border-radius: 20px;
+        padding: 1.8rem;
+        font-size: 1.3rem;
+        font-weight: 500;
+        background: #f8f9fa;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .stTextInput > div > div > input:focus {
+        background: white;
+        box-shadow: 0 0 0 5px rgba(102, 126, 234, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    /* Mobile responsive */
+    @media (max-width: 480px) {
+        .menu-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .menu-item {
+            aspect-ratio: auto;
+            padding: 2rem;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -346,7 +439,7 @@ def save_daily_report(station, data):
     return new_report["id"]
 
 def save_request(station, data):
-    """Save employee request"""
+    """Save employee request - REMOVED TITLE FIELD"""
     requests = []
     if os.path.exists(REQUESTS_FILE):
         try:
@@ -361,7 +454,6 @@ def save_request(station, data):
         "employee_name": data.get("employee_name", ""),
         "request_type": data.get("request_type", ""),
         "priority": data.get("priority", "Normal"),
-        "title": data.get("title", ""),
         "description": data.get("description", ""),
         "status": "Pending",
         "date_submitted": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -392,23 +484,24 @@ def display_product_result(product):
     """, unsafe_allow_html=True)
 
 def station_selection_page():
-    """Station selection page"""
+    """Station selection page - COMPLETELY REDESIGNED"""
     st.markdown("""
     <div class="station-selection">
         <div class="welcome-card">
-            <div class="welcome-title">🏪 Kirmani's</div>
-            <p style="margin-bottom: 2rem;">Employee Portal</p>
+            <div class="company-icon">🏪</div>
+            <div class="company-name">Kirmani's</div>
+            <div class="company-subtitle">Employee Portal</div>
         </div>
+        <div class="station-selection-main-title">Select Your Station</div>
     </div>
     """, unsafe_allow_html=True)
     
-    st.markdown("### Select Your Station:")
-    
-    # Station selection
+    # Station selection with improved styling
     selected_station = st.selectbox(
-        "Choose your station",
+        "",
         [""] + GAS_STATIONS,
-        key="station_select"
+        key="station_select",
+        placeholder="Choose your station..."
     )
     
     if selected_station:
@@ -420,7 +513,7 @@ def station_selection_page():
         st.info("Please select your gas station to continue")
 
 def main_menu_page():
-    """Main menu page"""
+    """Main menu page - SQUARE GRID LAYOUT"""
     station = st.session_state.get('selected_station', 'No Station')
     
     # Header
@@ -461,26 +554,63 @@ def main_menu_page():
     if not active_messages:
         st.markdown('<div class="alert">⚠️ <strong>Reminder:</strong> Submit daily report before shift ends</div>', unsafe_allow_html=True)
     
-    # Menu items
+    # SQUARE GRID MENU LAYOUT
+    st.markdown('<div class="main-menu"><div class="menu-grid">', unsafe_allow_html=True)
+    
+    # Create 2x2 grid using columns
     col1, col2 = st.columns(2)
     
     with col1:
-        if st.button("📊 Daily Data Entry\nEnter sales, gallons, and gas prices", key="daily_entry_btn"):
+        st.markdown("""
+        <div class="menu-item">
+            <span class="menu-icon">📊</span>
+            <div class="menu-title">Daily Data Entry</div>
+            <div class="menu-description">Enter sales, gallons, and gas prices</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button("📊", key="daily_entry_btn", help="Daily Data Entry"):
             st.session_state.current_page = "daily_entry"
             st.rerun()
         
-        if st.button("📝 Submit Request\nRequest supplies or report issues", key="request_btn"):
+        st.markdown("""
+        <div class="menu-item">
+            <span class="menu-icon">📝</span>
+            <div class="menu-title">Submit Request</div>
+            <div class="menu-description">Request supplies or report issues</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button("📝", key="request_btn", help="Submit Request"):
             st.session_state.current_page = "submit_request"
             st.rerun()
     
     with col2:
-        if st.button("🔍 Product Search\nScan barcodes and search products", key="search_btn"):
+        st.markdown("""
+        <div class="menu-item">
+            <span class="menu-icon">🔍</span>
+            <div class="menu-title">Product Search</div>
+            <div class="menu-description">Scan barcodes and search products</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button("🔍", key="search_btn", help="Product Search"):
             st.session_state.current_page = "product_search"
             st.rerun()
         
-        if st.button("💬 Messages\nView company announcements", key="messages_btn"):
+        st.markdown("""
+        <div class="menu-item">
+            <span class="menu-icon">💬</span>
+            <div class="menu-title">Messages</div>
+            <div class="menu-description">View company announcements</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button("💬", key="messages_btn", help="Messages"):
             st.session_state.current_page = "messages"
             st.rerun()
+    
+    st.markdown('</div></div>', unsafe_allow_html=True)
     
     # Change station button
     st.markdown("---")
@@ -544,68 +674,64 @@ def daily_entry_page():
                 st.error("Please enter at least merchandise sales or gallons sold data")
 
 def product_search_page():
-    """Product search page"""
+    """Product search page - BIG SEARCH BAR ONLY"""
     st.markdown("## 🔍 Product Search")
     
     if st.button("← Back to Menu", key="back_search"):
         st.session_state.current_page = "main_menu"
         st.rerun()
     
-    # Scanner area
-    st.markdown("""
-    <div class="scanner-area">
-        <div class="scanner-icon">📱</div>
-        <div><strong>Barcode Scanner</strong><br>Point camera at barcode</div>
-        <p style="margin-top: 1rem; opacity: 0.8;">Camera scanner integration needed for full functionality</p>
-    </div>
-    """, unsafe_allow_html=True)
+    # BIG SEARCH BAR - NO SCANNER STUFF
+    st.markdown('<div class="search-main-container">', unsafe_allow_html=True)
+    st.markdown('<div class="big-search-title">🔍 Search Products</div>', unsafe_allow_html=True)
     
-    # Manual search
-    st.markdown("### 🔍 Manual Search")
-    search_term = st.text_input("Enter product name or UPC code...", key="search_input")
+    search_term = st.text_input("", key="search_input", placeholder="🔍 Search products by name or UPC code...")
     
-    if search_term:
-        df = load_product_data()
-        if not df.empty:
-            # Search logic (same as before)
-            search_clean = search_term.strip()
-            
-            upc_search_variants = [search_clean]
-            if search_clean.isdigit():
-                upc_search_variants.append(search_clean.lstrip('0'))
-                if len(search_clean) < 12:
-                    upc_search_variants.append(search_clean.zfill(12))
-                if len(search_clean) < 14:
-                    upc_search_variants.append(search_clean.zfill(14))
-            
-            search_mask = (
-                df['Product_Name'].str.contains(search_clean, case=False, na=False) |
-                df['Department_Name'].str.contains(search_clean, case=False, na=False) |
-                df['Category'].str.contains(search_clean, case=False, na=False) |
-                df['Search_Terms'].str.contains(search_clean, case=False, na=False)
-            )
-            
-            for variant in upc_search_variants:
-                search_mask = search_mask | (
-                    df['UPC_Code'].str.contains(variant, case=False, na=False) |
-                    df['UPC_Search'].str.contains(variant, case=False, na=False)
+    if st.button("Search Products", key="search_button", use_container_width=True):
+        if search_term:
+            df = load_product_data()
+            if not df.empty:
+                # Search logic
+                search_clean = search_term.strip()
+                
+                upc_search_variants = [search_clean]
+                if search_clean.isdigit():
+                    upc_search_variants.append(search_clean.lstrip('0'))
+                    if len(search_clean) < 12:
+                        upc_search_variants.append(search_clean.zfill(12))
+                    if len(search_clean) < 14:
+                        upc_search_variants.append(search_clean.zfill(14))
+                
+                search_mask = (
+                    df['Product_Name'].str.contains(search_clean, case=False, na=False) |
+                    df['Department_Name'].str.contains(search_clean, case=False, na=False) |
+                    df['Category'].str.contains(search_clean, case=False, na=False) |
+                    df['Search_Terms'].str.contains(search_clean, case=False, na=False)
                 )
-            
-            filtered_df = df[search_mask]
-            
-            if len(filtered_df) > 0:
-                st.success(f"Found {len(filtered_df)} product(s) matching '{search_term}'")
                 
-                for _, product in filtered_df.head(10).iterrows():
-                    display_product_result(product)
+                for variant in upc_search_variants:
+                    search_mask = search_mask | (
+                        df['UPC_Code'].str.contains(variant, case=False, na=False) |
+                        df['UPC_Search'].str.contains(variant, case=False, na=False)
+                    )
                 
-                if len(filtered_df) > 10:
-                    st.info(f"Showing first 10 results. {len(filtered_df) - 10} more available.")
-            else:
-                st.warning(f"No products found matching '{search_term}'. Try different keywords.")
+                filtered_df = df[search_mask]
+                
+                if len(filtered_df) > 0:
+                    st.success(f"Found {len(filtered_df)} product(s) matching '{search_term}'")
+                    
+                    for _, product in filtered_df.head(10).iterrows():
+                        display_product_result(product)
+                    
+                    if len(filtered_df) > 10:
+                        st.info(f"Showing first 10 results. {len(filtered_df) - 10} more available.")
+                else:
+                    st.warning(f"No products found matching '{search_term}'. Try different keywords.")
+    
+    st.markdown('</div>', unsafe_allow_html=True)
 
 def submit_request_page():
-    """Submit request page"""
+    """Submit request page - NO REQUEST TITLE"""
     st.markdown("## 📝 Submit Request")
     
     if st.button("← Back to Menu", key="back_request"):
@@ -628,18 +754,17 @@ def submit_request_page():
         with col2:
             priority = st.selectbox("⚡ Priority", ["Normal", "Urgent", "Low"])
         
-        title = st.text_input("📌 Request Title", placeholder="Brief description")
+        # REMOVED REQUEST TITLE FIELD
         description = st.text_area("📄 Description", placeholder="Detailed information...", height=100)
         
         submitted = st.form_submit_button("🚀 Submit Request", use_container_width=True)
         
         if submitted:
-            if employee_name and title and description:
+            if employee_name and description:  # Removed title requirement
                 request_data = {
                     "employee_name": employee_name,
                     "request_type": request_type,
                     "priority": priority,
-                    "title": title,
                     "description": description
                 }
                 

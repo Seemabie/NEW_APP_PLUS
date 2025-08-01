@@ -25,7 +25,7 @@
             box-shadow: 0 0 30px rgba(0,0,0,0.3);
         }
 
-        /* Station Selection Page */
+        /* Station Selection Page - MAIN CHANGES HERE */
         .station-selection {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -42,41 +42,45 @@
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(20px);
             border-radius: 20px;
-            padding: 3rem 2rem;
+            padding: 2rem;
             border: 1px solid rgba(255, 255, 255, 0.2);
             width: 100%;
             max-width: 350px;
+            margin-bottom: 2rem;
         }
 
-        .welcome-card .small-icon {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
+        /* SMALL ICON - CHANGED */
+        .company-icon {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
             opacity: 0.8;
         }
 
-        .welcome-card h1 {
-            font-size: 1.3rem;
+        .company-name {
+            font-size: 1.1rem;
             font-weight: 600;
-            margin-bottom: 0.5rem;
-            opacity: 0.9;
+            margin-bottom: 0.3rem;
         }
 
-        .welcome-card p {
+        .company-subtitle {
             font-size: 0.9rem;
             opacity: 0.8;
-            margin-bottom: 2rem;
         }
 
-        .station-selection-title {
-            font-size: 1.6rem;
+        /* BIG STATION SELECTION TITLE - NEW */
+        .station-selection-main-title {
+            font-size: 2.2rem;
             font-weight: 800;
-            margin-bottom: 2rem;
+            margin: 2rem 0;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
             color: white;
+            text-align: center;
         }
 
         .dropdown-group {
-            margin: 1.5rem 0;
+            width: 100%;
+            max-width: 350px;
+            margin-bottom: 2rem;
         }
 
         .station-select {
@@ -115,7 +119,7 @@
             font-weight: 700;
             cursor: pointer;
             width: 100%;
-            margin-top: 2rem;
+            max-width: 350px;
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
         }
@@ -222,7 +226,7 @@
             padding: 1.5rem;
         }
 
-        /* Square grid layout for dashboard */
+        /* SQUARE GRID LAYOUT - CHANGED */
         .menu-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -232,7 +236,7 @@
         .menu-item {
             background: white;
             border-radius: 20px;
-            padding: 2rem 1.5rem;
+            padding: 1.5rem;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -262,12 +266,12 @@
             font-weight: 700;
             color: #2c3e50;
             margin-bottom: 0.5rem;
-            line-height: 1.3;
+            line-height: 1.2;
         }
 
         .menu-description {
             color: #6c757d;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             line-height: 1.3;
         }
 
@@ -377,40 +381,42 @@
             box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
         }
 
-        /* Product Search Styling */
-        .search-container {
+        /* PRODUCT SEARCH - BIG SEARCH BAR CHANGES */
+        .search-main-container {
             padding: 2rem;
             background: white;
             margin: 1.5rem;
             border-radius: 20px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            text-align: center;
         }
 
-        .main-search-bar {
+        .big-search-input {
             width: 100%;
-            padding: 1.5rem;
+            padding: 1.8rem;
             border: 3px solid #667eea;
             border-radius: 20px;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: 500;
             background: #f8f9fa;
             transition: all 0.3s ease;
             text-align: center;
+            margin-bottom: 1.5rem;
         }
 
-        .main-search-bar:focus {
+        .big-search-input:focus {
             outline: none;
             background: white;
             box-shadow: 0 0 0 5px rgba(102, 126, 234, 0.15);
             transform: translateY(-2px);
         }
 
-        .main-search-bar::placeholder {
+        .big-search-input::placeholder {
             color: #6c757d;
             font-weight: 400;
         }
 
-        .search-btn {
+        .search-button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
@@ -420,11 +426,10 @@
             font-weight: 600;
             width: 100%;
             cursor: pointer;
-            margin-top: 1.5rem;
             transition: all 0.3s ease;
         }
 
-        .search-btn:hover {
+        .search-button:hover {
             transform: translateY(-3px);
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
         }
@@ -498,16 +503,17 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Station Selection Page -->
+        <!-- Station Selection Page - COMPLETELY REDESIGNED -->
         <div id="station-selection" class="page active">
             <div class="station-selection">
                 <div class="welcome-card">
-                    <div class="small-icon">🏪</div>
-                    <h1>Kirmani's</h1>
-                    <p>Employee Portal</p>
+                    <div class="company-icon">🏪</div>
+                    <div class="company-name">Kirmani's</div>
+                    <div class="company-subtitle">Employee Portal</div>
                 </div>
                 
-                <div class="station-selection-title">Select Your Station</div>
+                <!-- BIG PROMINENT TITLE -->
+                <div class="station-selection-main-title">Select Your Station</div>
                 
                 <div class="dropdown-group">
                     <select class="station-select" id="stationSelect">
@@ -526,7 +532,7 @@
             </div>
         </div>
 
-        <!-- Main Menu Page -->
+        <!-- Main Menu Page - SQUARE GRID LAYOUT -->
         <div id="main-menu" class="page">
             <div class="header">
                 <h1>🏪 Kirmani's Gas Station</h1>
@@ -552,6 +558,7 @@
             </div>
 
             <div class="main-menu">
+                <!-- SQUARE GRID LAYOUT -->
                 <div class="menu-grid">
                     <div class="menu-item" onclick="showPage('daily-entry')">
                         <span class="menu-icon">📊</span>
@@ -622,20 +629,20 @@
             </div>
         </div>
 
-        <!-- Product Search Page -->
+        <!-- Product Search Page - BIG SEARCH BAR ONLY -->
         <div id="product-search" class="page">
             <div class="page-header">
                 <button class="back-btn" onclick="showPage('main-menu')">← Back</button>
                 <div class="page-title">Product Search</div>
             </div>
 
-            <div class="search-container">
-                <input type="text" class="main-search-bar" placeholder="🔍 Search products by name or UPC code...">
-                <button class="search-btn">Search Products</button>
+            <div class="search-main-container">
+                <input type="text" class="big-search-input" placeholder="🔍 Search products by name or UPC code...">
+                <button class="search-button">Search Products</button>
             </div>
         </div>
 
-        <!-- Submit Request Page -->
+        <!-- Submit Request Page - NO REQUEST TITLE -->
         <div id="submit-request" class="page">
             <div class="page-header">
                 <button class="back-btn" onclick="showPage('main-menu')">← Back</button>
@@ -671,6 +678,8 @@
                             </select>
                         </div>
                     </div>
+
+                    <!-- REMOVED REQUEST TITLE SECTION -->
 
                     <div class="form-group">
                         <label class="form-label">📄 Description</label>
