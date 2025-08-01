@@ -1,4 +1,23 @@
-import streamlit as st
+/* Enhanced text input for search - SINGLE SEARCH BAR STYLING */
+    .stTextInput > div > div > input {
+        border: 3px solid #667eea !important;
+        border-radius: 20px !important;
+        padding: 1.8rem !important;
+        font-size: 1.3rem !important;
+        font-weight: 500 !important;
+        background: #f8f9fa !important;
+        text-align: center !important;
+        transition: all 0.3s ease !important;
+        width: 100% !important;
+        margin: 2rem 0 !important;
+    }
+    
+    .stTextInput > div > div > input:focus {
+        background: white !important;
+        box-shadow: 0 0 0 5px rgba(102, 126, 234, 0.15) !important;
+        transform: translateY(-2px) !important;
+        outline: none !important;
+    }import streamlit as st
 import pandas as pd
 import json
 import os
@@ -256,34 +275,7 @@ st.markdown("""
         font-weight: 600;
     }
     
-    /* Enhanced Streamlit button styling for main menu */
-    .stButton > button {
-        background: white !important;
-        color: #2c3e50 !important;
-        border: 2px solid transparent !important;
-        border-radius: 20px !important;
-        padding: 2rem 1.5rem !important;
-        font-size: 0.9rem !important;
-        font-weight: 600 !important;
-        min-height: 150px !important;
-        box-shadow: 0 6px 25px rgba(0,0,0,0.1) !important;
-        transition: all 0.3s ease !important;
-        text-align: center !important;
-        line-height: 1.4 !important;
-        white-space: pre-line !important;
-    }
-    
-    .stButton > button:hover {
-        transform: translateY(-8px) !important;
-        box-shadow: 0 15px 45px rgba(0,0,0,0.2) !important;
-        border-color: #667eea !important;
-        background: white !important;
-    }
-    
-    .stButton > button:focus {
-        box-shadow: 0 15px 45px rgba(0,0,0,0.2) !important;
-        border-color: #667eea !important;
-    }
+    /* Remove global button styling - will be applied via JavaScript */
     
     /* Mobile responsive */
     @media (max-width: 480px) {
@@ -512,27 +504,75 @@ def main_menu_page():
     
     with col1:
         # Daily Data Entry - CLICKABLE MAIN BUTTON
-        if st.button("📊\n\nDaily Data Entry\n\nEnter sales, gallons, and gas prices", key="daily_entry_main", use_container_width=True, help="Daily Data Entry"):
+        if st.button("📊\n\nDaily Data Entry\n\nEnter sales, gallons, and gas prices", key="daily_entry_main", use_container_width=True):
             st.session_state.current_page = "daily_entry"
             st.rerun()
         
         # Submit Request - CLICKABLE MAIN BUTTON  
-        if st.button("📝\n\nSubmit Request\n\nRequest supplies or report issues", key="request_main", use_container_width=True, help="Submit Request"):
+        if st.button("📝\n\nSubmit Request\n\nRequest supplies or report issues", key="request_main", use_container_width=True):
             st.session_state.current_page = "submit_request"
             st.rerun()
     
     with col2:
         # Product Search - CLICKABLE MAIN BUTTON
-        if st.button("🔍\n\nProduct Search\n\nScan barcodes and search products", key="search_main", use_container_width=True, help="Product Search"):
+        if st.button("🔍\n\nProduct Search\n\nScan barcodes and search products", key="search_main", use_container_width=True):
             st.session_state.current_page = "product_search"
             st.rerun()
         
         # Messages - CLICKABLE MAIN BUTTON
-        if st.button("💬\n\nMessages\n\nView company announcements", key="messages_main", use_container_width=True, help="Messages"):
+        if st.button("💬\n\nMessages\n\nView company announcements", key="messages_main", use_container_width=True):
             st.session_state.current_page = "messages"
             st.rerun()
     
-    # Change station button
+    # JavaScript to style only main menu buttons
+    st.markdown("""
+    <script>
+        // Wait for page to load
+        setTimeout(function() {
+            // Target only the first 4 buttons (main menu buttons)
+            const allButtons = document.querySelectorAll('.stButton > button');
+            
+            // Style the first 4 buttons as main menu buttons
+            for (let i = 0; i < Math.min(4, allButtons.length); i++) {
+                const button = allButtons[i];
+                if (button) {
+                    button.style.cssText = `
+                        background: white !important;
+                        color: #2c3e50 !important;
+                        border: 2px solid transparent !important;
+                        border-radius: 20px !important;
+                        padding: 2rem 1.5rem !important;
+                        font-size: 0.9rem !important;
+                        font-weight: 600 !important;
+                        min-height: 150px !important;
+                        box-shadow: 0 6px 25px rgba(0,0,0,0.1) !important;
+                        transition: all 0.3s ease !important;
+                        text-align: center !important;
+                        line-height: 1.4 !important;
+                        white-space: pre-line !important;
+                        margin-bottom: 1rem !important;
+                        width: 100% !important;
+                    `;
+                    
+                    // Add hover effect
+                    button.addEventListener('mouseenter', function() {
+                        this.style.transform = 'translateY(-8px)';
+                        this.style.boxShadow = '0 15px 45px rgba(0,0,0,0.2)';
+                        this.style.borderColor = '#667eea';
+                    });
+                    
+                    button.addEventListener('mouseleave', function() {
+                        this.style.transform = 'translateY(0)';
+                        this.style.boxShadow = '0 6px 25px rgba(0,0,0,0.1)';
+                        this.style.borderColor = 'transparent';
+                    });
+                }
+            }
+        }, 100);
+    </script>
+    """, unsafe_allow_html=True)
+    
+    # Change station button - with normal styling
     st.markdown("---")
     if st.button("🔄 Change Station", key="change_station"):
         st.session_state.current_page = "station_selection"
