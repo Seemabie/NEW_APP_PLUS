@@ -382,7 +382,7 @@ def station_selection_page():
     """, unsafe_allow_html=True)
 
 def main_menu_page():
-    """Main menu page - SQUARE GRID LAYOUT WITH MANUAL STYLING"""
+    """Main menu page - SIMPLIFIED SQUARE GRID LAYOUT"""
     station = st.session_state.get('selected_station', 'No Station')
     
     # Header
@@ -423,66 +423,60 @@ def main_menu_page():
     if not active_messages:
         st.markdown('<div class="alert">⚠️ <strong>Reminder:</strong> Submit daily report before shift ends</div>', unsafe_allow_html=True)
     
-    # MANUAL SQUARE LAYOUT USING HTML AND BUTTONS
+    # Add CSS for square buttons
     st.markdown("""
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; padding: 1.5rem; margin-bottom: 2rem;">
-        <div id="daily-entry-card" style="background: white; border-radius: 20px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 6px 25px rgba(0,0,0,0.1); border: 2px solid transparent; aspect-ratio: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 15px 45px rgba(0,0,0,0.2)'; this.style.borderColor='#667eea';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 25px rgba(0,0,0,0.1)'; this.style.borderColor='transparent';">
-            <span style="font-size: 2.5rem; margin-bottom: 1rem; display: block;">📊</span>
-            <div style="font-size: 1rem; font-weight: 700; color: #2c3e50; margin-bottom: 0.5rem; line-height: 1.2;">Daily Data Entry</div>
-            <div style="color: #6c757d; font-size: 0.75rem; line-height: 1.3;">Enter sales, gallons, and gas prices</div>
-        </div>
+    <style>
+        .element-container:has(.square-button) .stButton > button {
+            background: white !important;
+            color: #2c3e50 !important;
+            border: 2px solid transparent !important;
+            border-radius: 20px !important;
+            padding: 2rem 1.5rem !important;
+            font-size: 0.9rem !important;
+            font-weight: 600 !important;
+            min-height: 150px !important;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.1) !important;
+            transition: all 0.3s ease !important;
+            text-align: center !important;
+            line-height: 1.4 !important;
+            white-space: pre-line !important;
+            width: 100% !important;
+        }
         
-        <div id="product-search-card" style="background: white; border-radius: 20px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 6px 25px rgba(0,0,0,0.1); border: 2px solid transparent; aspect-ratio: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 15px 45px rgba(0,0,0,0.2)'; this.style.borderColor='#667eea';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 25px rgba(0,0,0,0.1)'; this.style.borderColor='transparent';">
-            <span style="font-size: 2.5rem; margin-bottom: 1rem; display: block;">🔍</span>
-            <div style="font-size: 1rem; font-weight: 700; color: #2c3e50; margin-bottom: 0.5rem; line-height: 1.2;">Product Search</div>
-            <div style="color: #6c757d; font-size: 0.75rem; line-height: 1.3;">Scan barcodes and search products</div>
-        </div>
-        
-        <div id="submit-request-card" style="background: white; border-radius: 20px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 6px 25px rgba(0,0,0,0.1); border: 2px solid transparent; aspect-ratio: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 15px 45px rgba(0,0,0,0.2)'; this.style.borderColor='#667eea';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 25px rgba(0,0,0,0.1)'; this.style.borderColor='transparent';">
-            <span style="font-size: 2.5rem; margin-bottom: 1rem; display: block;">📝</span>
-            <div style="font-size: 1rem; font-weight: 700; color: #2c3e50; margin-bottom: 0.5rem; line-height: 1.2;">Submit Request</div>
-            <div style="color: #6c757d; font-size: 0.75rem; line-height: 1.3;">Request supplies or report issues</div>
-        </div>
-        
-        <div id="messages-card" style="background: white; border-radius: 20px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 6px 25px rgba(0,0,0,0.1); border: 2px solid transparent; aspect-ratio: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 15px 45px rgba(0,0,0,0.2)'; this.style.borderColor='#667eea';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 25px rgba(0,0,0,0.1)'; this.style.borderColor='transparent';">
-            <span style="font-size: 2.5rem; margin-bottom: 1rem; display: block;">💬</span>
-            <div style="font-size: 1rem; font-weight: 700; color: #2c3e50; margin-bottom: 0.5rem; line-height: 1.2;">Messages</div>
-            <div style="color: #6c757d; font-size: 0.75rem; line-height: 1.3;">View company announcements</div>
-        </div>
-    </div>
-    
-    <script>
-        document.getElementById('daily-entry-card').onclick = function() { 
-            window.parent.postMessage({type: 'streamlit:setComponentValue', value: 'daily_entry'}, '*'); 
-        };
-        document.getElementById('product-search-card').onclick = function() { 
-            window.parent.postMessage({type: 'streamlit:setComponentValue', value: 'product_search'}, '*'); 
-        };
-        document.getElementById('submit-request-card').onclick = function() { 
-            window.parent.postMessage({type: 'streamlit:setComponentValue', value: 'submit_request'}, '*'); 
-        };
-        document.getElementById('messages-card').onclick = function() { 
-            window.parent.postMessage({type: 'streamlit:setComponentValue', value: 'messages'}, '*'); 
-        };
-    </script>
+        .element-container:has(.square-button) .stButton > button:hover {
+            transform: translateY(-8px) !important;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.2) !important;
+            border-color: #667eea !important;
+        }
+    </style>
     """, unsafe_allow_html=True)
     
-    # Hidden buttons for navigation (triggered by JavaScript)
-    col1, col2, col3, col4 = st.columns(4)
+    # SIMPLE SQUARE GRID MENU LAYOUT
+    col1, col2 = st.columns(2)
+    
     with col1:
-        if st.button("📊", key="daily_entry_hidden", help="Daily Data Entry"):
+        # Daily Data Entry - LARGE SQUARE BUTTON
+        st.markdown('<div class="square-button"></div>', unsafe_allow_html=True)
+        if st.button("📊\n\nDaily Data Entry\n\nEnter sales, gallons, and gas prices", key="daily_entry_main", use_container_width=True):
             st.session_state.current_page = "daily_entry"
             st.rerun()
-    with col2:
-        if st.button("🔍", key="search_hidden", help="Product Search"):
-            st.session_state.current_page = "product_search"
-            st.rerun()
-    with col3:
-        if st.button("📝", key="request_hidden", help="Submit Request"):
+        
+        # Submit Request - LARGE SQUARE BUTTON
+        st.markdown('<div class="square-button"></div>', unsafe_allow_html=True)
+        if st.button("📝\n\nSubmit Request\n\nRequest supplies or report issues", key="request_main", use_container_width=True):
             st.session_state.current_page = "submit_request"
             st.rerun()
-    with col4:
-        if st.button("💬", key="messages_hidden", help="Messages"):
+    
+    with col2:
+        # Product Search - LARGE SQUARE BUTTON
+        st.markdown('<div class="square-button"></div>', unsafe_allow_html=True)
+        if st.button("🔍\n\nProduct Search\n\nScan barcodes and search products", key="search_main", use_container_width=True):
+            st.session_state.current_page = "product_search"
+            st.rerun()
+        
+        # Messages - LARGE SQUARE BUTTON
+        st.markdown('<div class="square-button"></div>', unsafe_allow_html=True)
+        if st.button("💬\n\nMessages\n\nView company announcements", key="messages_main", use_container_width=True):
             st.session_state.current_page = "messages"
             st.rerun()
     
