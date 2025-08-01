@@ -27,7 +27,7 @@ GAS_STATIONS = [
     "🏪 Verbank"
 ]
 
-# UPDATED CSS - MATCHING NEW HTML DESIGN
+# UPDATED CSS - CLEAN VERSION
 st.markdown("""
 <style>
     /* Hide Streamlit default elements */
@@ -43,58 +43,6 @@ st.markdown("""
         margin: 0 auto;
         background: #f8f9fa;
         min-height: 100vh;
-    }
-    
-    /* Station selection styling - COMPLETELY UPDATED */
-    .station-selection {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        min-height: 100vh;
-        padding: 2rem;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-    
-    .welcome-card {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(20px);
-        border-radius: 20px;
-        padding: 2rem;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        margin-bottom: 2rem;
-        max-width: 350px;
-        width: 100%;
-    }
-    
-    /* SMALL ICON - NEW */
-    .company-icon {
-        font-size: 1.2rem;
-        margin-bottom: 0.5rem;
-        opacity: 0.8;
-    }
-    
-    .company-name {
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: 0.3rem;
-    }
-    
-    .company-subtitle {
-        font-size: 0.9rem;
-        opacity: 0.8;
-    }
-    
-    /* BIG STATION SELECTION TITLE - UPDATED FOR 80% FOCUS */
-    .station-selection-main-title {
-        font-size: 3rem;
-        font-weight: 800;
-        margin: 4rem 0 3rem 0;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        color: white;
-        text-align: center;
     }
     
     /* Header styling */
@@ -168,7 +116,7 @@ st.markdown("""
         color: #721c24;
     }
     
-    /* SQUARE MENU ITEMS - UPDATED */
+    /* SQUARE MENU ITEMS */
     .main-menu {
         padding: 1.5rem;
     }
@@ -238,7 +186,7 @@ st.markdown("""
         margin-bottom: 1.5rem;
     }
     
-    /* BIG SEARCH BAR - NEW */
+    /* BIG SEARCH BAR */
     .search-main-container {
         padding: 2rem;
         background: white;
@@ -308,65 +256,33 @@ st.markdown("""
         font-weight: 600;
     }
     
-    /* Enhanced Streamlit widgets styling */
-    .stSelectbox > div > div {
-        background: rgba(255, 255, 255, 0.15);
-        border: 2px solid rgba(255, 255, 255, 0.4);
-        border-radius: 15px;
-        color: white;
-        padding: 1.2rem;
-        font-size: 1.1rem;
-        font-weight: 600;
-        backdrop-filter: blur(10px);
-    }
-    
-    .stSelectbox > div > div:focus {
-        border-color: rgba(255, 255, 255, 0.7);
-        background: rgba(255, 255, 255, 0.25);
-    }
-    
+    /* Enhanced Streamlit button styling for main menu */
     .stButton > button {
-        background: rgba(255, 255, 255, 0.25);
-        color: white;
-        border: 2px solid rgba(255, 255, 255, 0.4);
-        border-radius: 30px;
-        width: 100%;
-        padding: 1.2rem 2.5rem;
-        font-weight: 700;
-        font-size: 1.1rem;
-        backdrop-filter: blur(10px);
-        transition: all 0.3s ease;
+        background: white !important;
+        color: #2c3e50 !important;
+        border: 2px solid transparent !important;
+        border-radius: 20px !important;
+        padding: 2rem 1.5rem !important;
+        font-size: 0.9rem !important;
+        font-weight: 600 !important;
+        min-height: 150px !important;
+        box-shadow: 0 6px 25px rgba(0,0,0,0.1) !important;
+        transition: all 0.3s ease !important;
+        text-align: center !important;
+        line-height: 1.4 !important;
+        white-space: pre-line !important;
     }
     
     .stButton > button:hover {
-        background: rgba(255, 255, 255, 0.35);
-        border-color: rgba(255, 255, 255, 0.5);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        transform: translateY(-8px) !important;
+        box-shadow: 0 15px 45px rgba(0,0,0,0.2) !important;
+        border-color: #667eea !important;
+        background: white !important;
     }
     
-    .stButton > button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        transform: none;
-    }
-    
-    /* Enhanced text input */
-    .stTextInput > div > div > input {
-        border: 3px solid #667eea;
-        border-radius: 20px;
-        padding: 1.8rem;
-        font-size: 1.3rem;
-        font-weight: 500;
-        background: #f8f9fa;
-        text-align: center;
-        transition: all 0.3s ease;
-    }
-    
-    .stTextInput > div > div > input:focus {
-        background: white;
-        box-shadow: 0 0 0 5px rgba(102, 126, 234, 0.15);
-        transform: translateY(-2px);
+    .stButton > button:focus {
+        box-shadow: 0 15px 45px rgba(0,0,0,0.2) !important;
+        border-color: #667eea !important;
     }
     
     /* Mobile responsive */
@@ -484,39 +400,73 @@ def display_product_result(product):
     """, unsafe_allow_html=True)
 
 def station_selection_page():
-    """Station selection page - 80% STATION SELECTION FOCUSED"""
+    """Station selection page - CLEAN VERSION"""
+    
+    # Custom CSS for this page only
     st.markdown("""
-    <div class="station-selection">
-        <div class="station-selection-main-title">Select Your Station</div>
+    <style>
+        .main > div {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+        
+        .stSelectbox > div > div {
+            background: rgba(255, 255, 255, 0.15) !important;
+            border: 2px solid rgba(255, 255, 255, 0.4) !important;
+            border-radius: 15px !important;
+            color: white !important;
+            padding: 1.2rem !important;
+            font-size: 1.1rem !important;
+            font-weight: 600 !important;
+            backdrop-filter: blur(10px) !important;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Title
+    st.markdown("""
+    <div style="text-align: center; color: white; margin-bottom: 3rem;">
+        <h1 style="font-size: 3rem; font-weight: 800; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+            Select Your Station
+        </h1>
     </div>
     """, unsafe_allow_html=True)
     
-    # Station selection with improved styling
-    selected_station = st.selectbox(
-        "",
-        [""] + GAS_STATIONS,
-        key="station_select",
-        placeholder="Choose your station..."
-    )
+    # Center the form using columns
+    col1, col2, col3 = st.columns([1, 2, 1])
     
-    if selected_station:
-        if st.button("Continue to Dashboard", key="continue_btn"):
-            st.session_state.selected_station = selected_station
-            st.session_state.current_page = "main_menu"
-            st.rerun()
-    else:
-        st.info("Please select your gas station to continue")
+    with col2:
+        # Station selection
+        selected_station = st.selectbox(
+            "",
+            [""] + GAS_STATIONS,
+            key="station_select",
+            label_visibility="collapsed"
+        )
+        
+        if selected_station:
+            if st.button("Continue to Dashboard", key="continue_btn", use_container_width=True):
+                st.session_state.selected_station = selected_station
+                st.session_state.current_page = "main_menu"
+                st.rerun()
+        else:
+            st.info("Please select your gas station to continue")
     
     # Small company info at bottom
     st.markdown("""
     <div style="position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); 
-                text-align: center; color: rgba(255,255,255,0.7); font-size: 0.9rem;">
+                text-align: center; color: rgba(255,255,255,0.7); font-size: 0.9rem; z-index: 1001;">
         🏪 Kirmani's Employee Portal
     </div>
     """, unsafe_allow_html=True)
 
 def main_menu_page():
-    """Main menu page - SQUARE GRID LAYOUT"""
+    """Main menu page - CLICKABLE SQUARE GRID LAYOUT"""
     station = st.session_state.get('selected_station', 'No Station')
     
     # Header
@@ -557,63 +507,30 @@ def main_menu_page():
     if not active_messages:
         st.markdown('<div class="alert">⚠️ <strong>Reminder:</strong> Submit daily report before shift ends</div>', unsafe_allow_html=True)
     
-    # SQUARE GRID MENU LAYOUT
-    st.markdown('<div class="main-menu"><div class="menu-grid">', unsafe_allow_html=True)
-    
-    # Create 2x2 grid using columns
+    # CLICKABLE SQUARE GRID MENU LAYOUT
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("""
-        <div class="menu-item">
-            <span class="menu-icon">📊</span>
-            <div class="menu-title">Daily Data Entry</div>
-            <div class="menu-description">Enter sales, gallons, and gas prices</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        if st.button("📊", key="daily_entry_btn", help="Daily Data Entry"):
+        # Daily Data Entry - CLICKABLE MAIN BUTTON
+        if st.button("📊\n\nDaily Data Entry\n\nEnter sales, gallons, and gas prices", key="daily_entry_main", use_container_width=True, help="Daily Data Entry"):
             st.session_state.current_page = "daily_entry"
             st.rerun()
         
-        st.markdown("""
-        <div class="menu-item">
-            <span class="menu-icon">📝</span>
-            <div class="menu-title">Submit Request</div>
-            <div class="menu-description">Request supplies or report issues</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        if st.button("📝", key="request_btn", help="Submit Request"):
+        # Submit Request - CLICKABLE MAIN BUTTON  
+        if st.button("📝\n\nSubmit Request\n\nRequest supplies or report issues", key="request_main", use_container_width=True, help="Submit Request"):
             st.session_state.current_page = "submit_request"
             st.rerun()
     
     with col2:
-        st.markdown("""
-        <div class="menu-item">
-            <span class="menu-icon">🔍</span>
-            <div class="menu-title">Product Search</div>
-            <div class="menu-description">Scan barcodes and search products</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        if st.button("🔍", key="search_btn", help="Product Search"):
+        # Product Search - CLICKABLE MAIN BUTTON
+        if st.button("🔍\n\nProduct Search\n\nScan barcodes and search products", key="search_main", use_container_width=True, help="Product Search"):
             st.session_state.current_page = "product_search"
             st.rerun()
         
-        st.markdown("""
-        <div class="menu-item">
-            <span class="menu-icon">💬</span>
-            <div class="menu-title">Messages</div>
-            <div class="menu-description">View company announcements</div>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        if st.button("💬", key="messages_btn", help="Messages"):
+        # Messages - CLICKABLE MAIN BUTTON
+        if st.button("💬\n\nMessages\n\nView company announcements", key="messages_main", use_container_width=True, help="Messages"):
             st.session_state.current_page = "messages"
             st.rerun()
-    
-    st.markdown('</div></div>', unsafe_allow_html=True)
     
     # Change station button
     st.markdown("---")
@@ -677,61 +594,60 @@ def daily_entry_page():
                 st.error("Please enter at least merchandise sales or gallons sold data")
 
 def product_search_page():
-    """Product search page - BIG SEARCH BAR ONLY"""
+    """Product search page - AUTO SEARCH WITH SINGLE BAR"""
     st.markdown("## 🔍 Product Search")
     
     if st.button("← Back to Menu", key="back_search"):
         st.session_state.current_page = "main_menu"
         st.rerun()
     
-    # BIG SEARCH BAR - NO SCANNER STUFF
-    st.markdown('<div class="search-main-container">', unsafe_allow_html=True)
-    st.markdown('<div class="big-search-title">🔍 Search Products</div>', unsafe_allow_html=True)
+    # SINGLE SEARCH BAR - AUTO SEARCH
+    search_term = st.text_input("🔍 Search products by name or UPC code...", key="search_input", placeholder="Start typing to search...")
     
-    search_term = st.text_input("", key="search_input", placeholder="🔍 Search products by name or UPC code...")
-    
-    if st.button("Search Products", key="search_button", use_container_width=True):
-        if search_term:
-            df = load_product_data()
-            if not df.empty:
-                # Search logic
-                search_clean = search_term.strip()
-                
-                upc_search_variants = [search_clean]
-                if search_clean.isdigit():
-                    upc_search_variants.append(search_clean.lstrip('0'))
-                    if len(search_clean) < 12:
-                        upc_search_variants.append(search_clean.zfill(12))
-                    if len(search_clean) < 14:
-                        upc_search_variants.append(search_clean.zfill(14))
-                
-                search_mask = (
-                    df['Product_Name'].str.contains(search_clean, case=False, na=False) |
-                    df['Department_Name'].str.contains(search_clean, case=False, na=False) |
-                    df['Category'].str.contains(search_clean, case=False, na=False) |
-                    df['Search_Terms'].str.contains(search_clean, case=False, na=False)
+    # AUTO SEARCH - triggers when user types
+    if search_term and search_term.strip():
+        df = load_product_data()
+        if not df.empty:
+            # Search logic
+            search_clean = search_term.strip()
+            
+            upc_search_variants = [search_clean]
+            if search_clean.isdigit():
+                upc_search_variants.append(search_clean.lstrip('0'))
+                if len(search_clean) < 12:
+                    upc_search_variants.append(search_clean.zfill(12))
+                if len(search_clean) < 14:
+                    upc_search_variants.append(search_clean.zfill(14))
+            
+            search_mask = (
+                df['Product_Name'].str.contains(search_clean, case=False, na=False) |
+                df['Department_Name'].str.contains(search_clean, case=False, na=False) |
+                df['Category'].str.contains(search_clean, case=False, na=False) |
+                df['Search_Terms'].str.contains(search_clean, case=False, na=False)
+            )
+            
+            for variant in upc_search_variants:
+                search_mask = search_mask | (
+                    df['UPC_Code'].str.contains(variant, case=False, na=False) |
+                    df['UPC_Search'].str.contains(variant, case=False, na=False)
                 )
+            
+            filtered_df = df[search_mask]
+            
+            if len(filtered_df) > 0:
+                st.success(f"Found {len(filtered_df)} product(s) matching '{search_term}'")
                 
-                for variant in upc_search_variants:
-                    search_mask = search_mask | (
-                        df['UPC_Code'].str.contains(variant, case=False, na=False) |
-                        df['UPC_Search'].str.contains(variant, case=False, na=False)
-                    )
+                for _, product in filtered_df.head(10).iterrows():
+                    display_product_result(product)
                 
-                filtered_df = df[search_mask]
-                
-                if len(filtered_df) > 0:
-                    st.success(f"Found {len(filtered_df)} product(s) matching '{search_term}'")
-                    
-                    for _, product in filtered_df.head(10).iterrows():
-                        display_product_result(product)
-                    
-                    if len(filtered_df) > 10:
-                        st.info(f"Showing first 10 results. {len(filtered_df) - 10} more available.")
-                else:
-                    st.warning(f"No products found matching '{search_term}'. Try different keywords.")
-    
-    st.markdown('</div>', unsafe_allow_html=True)
+                if len(filtered_df) > 10:
+                    st.info(f"Showing first 10 results. {len(filtered_df) - 10} more available.")
+            else:
+                st.warning(f"No products found matching '{search_term}'. Try different keywords.")
+    elif search_term == "":
+        st.info("Start typing in the search bar to find products...")
+    else:
+        st.info("Enter at least one character to start searching...")
 
 def submit_request_page():
     """Submit request page - NO REQUEST TITLE"""
@@ -757,7 +673,7 @@ def submit_request_page():
         with col2:
             priority = st.selectbox("⚡ Priority", ["Normal", "Urgent", "Low"])
         
-        # REMOVED REQUEST TITLE FIELD
+        # NO REQUEST TITLE FIELD
         description = st.text_area("📄 Description", placeholder="Detailed information...", height=100)
         
         submitted = st.form_submit_button("🚀 Submit Request", use_container_width=True)
