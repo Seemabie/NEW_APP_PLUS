@@ -1,23 +1,4 @@
-/* Enhanced text input for search - SINGLE SEARCH BAR STYLING */
-    .stTextInput > div > div > input {
-        border: 3px solid #667eea !important;
-        border-radius: 20px !important;
-        padding: 1.8rem !important;
-        font-size: 1.3rem !important;
-        font-weight: 500 !important;
-        background: #f8f9fa !important;
-        text-align: center !important;
-        transition: all 0.3s ease !important;
-        width: 100% !important;
-        margin: 2rem 0 !important;
-    }
-    
-    .stTextInput > div > div > input:focus {
-        background: white !important;
-        box-shadow: 0 0 0 5px rgba(102, 126, 234, 0.15) !important;
-        transform: translateY(-2px) !important;
-        outline: none !important;
-    }import streamlit as st
+import streamlit as st
 import pandas as pd
 import json
 import os
@@ -46,7 +27,7 @@ GAS_STATIONS = [
     "🏪 Verbank"
 ]
 
-# UPDATED CSS - CLEAN VERSION
+# CLEAN CSS - NO GLOBAL BUTTON STYLING
 st.markdown("""
 <style>
     /* Hide Streamlit default elements */
@@ -135,59 +116,6 @@ st.markdown("""
         color: #721c24;
     }
     
-    /* SQUARE MENU ITEMS */
-    .main-menu {
-        padding: 1.5rem;
-    }
-    
-    .menu-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.5rem;
-    }
-    
-    .menu-item {
-        background: white;
-        border-radius: 20px;
-        padding: 1.5rem;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 6px 25px rgba(0,0,0,0.1);
-        border: 2px solid transparent;
-        aspect-ratio: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-    
-    .menu-item:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 15px 45px rgba(0,0,0,0.2);
-        border-color: #667eea;
-    }
-    
-    .menu-icon {
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
-        display: block;
-    }
-    
-    .menu-title {
-        font-size: 1rem;
-        font-weight: 700;
-        color: #2c3e50;
-        margin-bottom: 0.5rem;
-        line-height: 1.2;
-    }
-    
-    .menu-description {
-        color: #6c757d;
-        font-size: 0.75rem;
-        line-height: 1.3;
-    }
-    
     /* Form styling */
     .form-section {
         background: white;
@@ -203,24 +131,6 @@ st.markdown("""
         font-weight: 700;
         color: #2c3e50;
         margin-bottom: 1.5rem;
-    }
-    
-    /* BIG SEARCH BAR */
-    .search-main-container {
-        padding: 2rem;
-        background: white;
-        margin: 1.5rem;
-        border-radius: 20px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        text-align: center;
-    }
-    
-    .big-search-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #2c3e50;
-        margin-bottom: 2rem;
-        text-align: center;
     }
     
     /* Results styling */
@@ -275,17 +185,31 @@ st.markdown("""
         font-weight: 600;
     }
     
-    /* Remove global button styling - will be applied via JavaScript */
+    /* Search input styling */
+    .stTextInput > div > div > input {
+        border: 3px solid #667eea;
+        border-radius: 20px;
+        padding: 1.8rem;
+        font-size: 1.3rem;
+        font-weight: 500;
+        background: #f8f9fa;
+        text-align: center;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin: 2rem 0;
+    }
+    
+    .stTextInput > div > div > input:focus {
+        background: white;
+        box-shadow: 0 0 0 5px rgba(102, 126, 234, 0.15);
+        transform: translateY(-2px);
+        outline: none;
+    }
     
     /* Mobile responsive */
     @media (max-width: 480px) {
-        .menu-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .menu-item {
-            aspect-ratio: auto;
-            padding: 2rem;
+        .main > div {
+            max-width: 100%;
         }
     }
 </style>
@@ -458,7 +382,7 @@ def station_selection_page():
     """, unsafe_allow_html=True)
 
 def main_menu_page():
-    """Main menu page - CLICKABLE SQUARE GRID LAYOUT"""
+    """Main menu page - SQUARE GRID LAYOUT WITH MANUAL STYLING"""
     station = st.session_state.get('selected_station', 'No Station')
     
     # Header
@@ -499,80 +423,70 @@ def main_menu_page():
     if not active_messages:
         st.markdown('<div class="alert">⚠️ <strong>Reminder:</strong> Submit daily report before shift ends</div>', unsafe_allow_html=True)
     
-    # CLICKABLE SQUARE GRID MENU LAYOUT
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        # Daily Data Entry - CLICKABLE MAIN BUTTON
-        if st.button("📊\n\nDaily Data Entry\n\nEnter sales, gallons, and gas prices", key="daily_entry_main", use_container_width=True):
-            st.session_state.current_page = "daily_entry"
-            st.rerun()
-        
-        # Submit Request - CLICKABLE MAIN BUTTON  
-        if st.button("📝\n\nSubmit Request\n\nRequest supplies or report issues", key="request_main", use_container_width=True):
-            st.session_state.current_page = "submit_request"
-            st.rerun()
-    
-    with col2:
-        # Product Search - CLICKABLE MAIN BUTTON
-        if st.button("🔍\n\nProduct Search\n\nScan barcodes and search products", key="search_main", use_container_width=True):
-            st.session_state.current_page = "product_search"
-            st.rerun()
-        
-        # Messages - CLICKABLE MAIN BUTTON
-        if st.button("💬\n\nMessages\n\nView company announcements", key="messages_main", use_container_width=True):
-            st.session_state.current_page = "messages"
-            st.rerun()
-    
-    # JavaScript to style only main menu buttons
+    # MANUAL SQUARE LAYOUT USING HTML AND BUTTONS
     st.markdown("""
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; padding: 1.5rem; margin-bottom: 2rem;">
+        <div id="daily-entry-card" style="background: white; border-radius: 20px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 6px 25px rgba(0,0,0,0.1); border: 2px solid transparent; aspect-ratio: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 15px 45px rgba(0,0,0,0.2)'; this.style.borderColor='#667eea';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 25px rgba(0,0,0,0.1)'; this.style.borderColor='transparent';">
+            <span style="font-size: 2.5rem; margin-bottom: 1rem; display: block;">📊</span>
+            <div style="font-size: 1rem; font-weight: 700; color: #2c3e50; margin-bottom: 0.5rem; line-height: 1.2;">Daily Data Entry</div>
+            <div style="color: #6c757d; font-size: 0.75rem; line-height: 1.3;">Enter sales, gallons, and gas prices</div>
+        </div>
+        
+        <div id="product-search-card" style="background: white; border-radius: 20px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 6px 25px rgba(0,0,0,0.1); border: 2px solid transparent; aspect-ratio: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 15px 45px rgba(0,0,0,0.2)'; this.style.borderColor='#667eea';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 25px rgba(0,0,0,0.1)'; this.style.borderColor='transparent';">
+            <span style="font-size: 2.5rem; margin-bottom: 1rem; display: block;">🔍</span>
+            <div style="font-size: 1rem; font-weight: 700; color: #2c3e50; margin-bottom: 0.5rem; line-height: 1.2;">Product Search</div>
+            <div style="color: #6c757d; font-size: 0.75rem; line-height: 1.3;">Scan barcodes and search products</div>
+        </div>
+        
+        <div id="submit-request-card" style="background: white; border-radius: 20px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 6px 25px rgba(0,0,0,0.1); border: 2px solid transparent; aspect-ratio: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 15px 45px rgba(0,0,0,0.2)'; this.style.borderColor='#667eea';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 25px rgba(0,0,0,0.1)'; this.style.borderColor='transparent';">
+            <span style="font-size: 2.5rem; margin-bottom: 1rem; display: block;">📝</span>
+            <div style="font-size: 1rem; font-weight: 700; color: #2c3e50; margin-bottom: 0.5rem; line-height: 1.2;">Submit Request</div>
+            <div style="color: #6c757d; font-size: 0.75rem; line-height: 1.3;">Request supplies or report issues</div>
+        </div>
+        
+        <div id="messages-card" style="background: white; border-radius: 20px; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 6px 25px rgba(0,0,0,0.1); border: 2px solid transparent; aspect-ratio: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;" onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 15px 45px rgba(0,0,0,0.2)'; this.style.borderColor='#667eea';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 25px rgba(0,0,0,0.1)'; this.style.borderColor='transparent';">
+            <span style="font-size: 2.5rem; margin-bottom: 1rem; display: block;">💬</span>
+            <div style="font-size: 1rem; font-weight: 700; color: #2c3e50; margin-bottom: 0.5rem; line-height: 1.2;">Messages</div>
+            <div style="color: #6c757d; font-size: 0.75rem; line-height: 1.3;">View company announcements</div>
+        </div>
+    </div>
+    
     <script>
-        // Wait for page to load
-        setTimeout(function() {
-            // Target only the first 4 buttons (main menu buttons)
-            const allButtons = document.querySelectorAll('.stButton > button');
-            
-            // Style the first 4 buttons as main menu buttons
-            for (let i = 0; i < Math.min(4, allButtons.length); i++) {
-                const button = allButtons[i];
-                if (button) {
-                    button.style.cssText = `
-                        background: white !important;
-                        color: #2c3e50 !important;
-                        border: 2px solid transparent !important;
-                        border-radius: 20px !important;
-                        padding: 2rem 1.5rem !important;
-                        font-size: 0.9rem !important;
-                        font-weight: 600 !important;
-                        min-height: 150px !important;
-                        box-shadow: 0 6px 25px rgba(0,0,0,0.1) !important;
-                        transition: all 0.3s ease !important;
-                        text-align: center !important;
-                        line-height: 1.4 !important;
-                        white-space: pre-line !important;
-                        margin-bottom: 1rem !important;
-                        width: 100% !important;
-                    `;
-                    
-                    // Add hover effect
-                    button.addEventListener('mouseenter', function() {
-                        this.style.transform = 'translateY(-8px)';
-                        this.style.boxShadow = '0 15px 45px rgba(0,0,0,0.2)';
-                        this.style.borderColor = '#667eea';
-                    });
-                    
-                    button.addEventListener('mouseleave', function() {
-                        this.style.transform = 'translateY(0)';
-                        this.style.boxShadow = '0 6px 25px rgba(0,0,0,0.1)';
-                        this.style.borderColor = 'transparent';
-                    });
-                }
-            }
-        }, 100);
+        document.getElementById('daily-entry-card').onclick = function() { 
+            window.parent.postMessage({type: 'streamlit:setComponentValue', value: 'daily_entry'}, '*'); 
+        };
+        document.getElementById('product-search-card').onclick = function() { 
+            window.parent.postMessage({type: 'streamlit:setComponentValue', value: 'product_search'}, '*'); 
+        };
+        document.getElementById('submit-request-card').onclick = function() { 
+            window.parent.postMessage({type: 'streamlit:setComponentValue', value: 'submit_request'}, '*'); 
+        };
+        document.getElementById('messages-card').onclick = function() { 
+            window.parent.postMessage({type: 'streamlit:setComponentValue', value: 'messages'}, '*'); 
+        };
     </script>
     """, unsafe_allow_html=True)
     
-    # Change station button - with normal styling
+    # Hidden buttons for navigation (triggered by JavaScript)
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        if st.button("📊", key="daily_entry_hidden", help="Daily Data Entry"):
+            st.session_state.current_page = "daily_entry"
+            st.rerun()
+    with col2:
+        if st.button("🔍", key="search_hidden", help="Product Search"):
+            st.session_state.current_page = "product_search"
+            st.rerun()
+    with col3:
+        if st.button("📝", key="request_hidden", help="Submit Request"):
+            st.session_state.current_page = "submit_request"
+            st.rerun()
+    with col4:
+        if st.button("💬", key="messages_hidden", help="Messages"):
+            st.session_state.current_page = "messages"
+            st.rerun()
+    
+    # Change station button - normal styling
     st.markdown("---")
     if st.button("🔄 Change Station", key="change_station"):
         st.session_state.current_page = "station_selection"
