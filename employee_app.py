@@ -87,11 +87,11 @@ st.markdown("""
         opacity: 0.8;
     }
     
-    /* BIG STATION SELECTION TITLE - NEW */
+    /* BIG STATION SELECTION TITLE - UPDATED FOR 80% FOCUS */
     .station-selection-main-title {
-        font-size: 2.2rem;
+        font-size: 3rem;
         font-weight: 800;
-        margin: 2rem 0;
+        margin: 4rem 0 3rem 0;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         color: white;
         text-align: center;
@@ -484,14 +484,9 @@ def display_product_result(product):
     """, unsafe_allow_html=True)
 
 def station_selection_page():
-    """Station selection page - COMPLETELY REDESIGNED"""
+    """Station selection page - 80% STATION SELECTION FOCUSED"""
     st.markdown("""
     <div class="station-selection">
-        <div class="welcome-card">
-            <div class="company-icon">🏪</div>
-            <div class="company-name">Kirmani's</div>
-            <div class="company-subtitle">Employee Portal</div>
-        </div>
         <div class="station-selection-main-title">Select Your Station</div>
     </div>
     """, unsafe_allow_html=True)
@@ -511,6 +506,14 @@ def station_selection_page():
             st.rerun()
     else:
         st.info("Please select your gas station to continue")
+    
+    # Small company info at bottom
+    st.markdown("""
+    <div style="position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); 
+                text-align: center; color: rgba(255,255,255,0.7); font-size: 0.9rem;">
+        🏪 Kirmani's Employee Portal
+    </div>
+    """, unsafe_allow_html=True)
 
 def main_menu_page():
     """Main menu page - SQUARE GRID LAYOUT"""
