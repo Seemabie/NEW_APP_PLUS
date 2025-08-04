@@ -71,16 +71,6 @@ st.markdown("""
         color: #27ae60;
     }
     
-    .age-restricted {
-        background: #e74c3c;
-        color: white;
-        padding: 0.2rem 0.6rem;
-        border-radius: 4px;
-        font-size: 0.8rem;
-        font-weight: bold;
-        margin-left: 1rem;
-    }
-    
     .no-results {
         text-align: center;
         color: #7f8c8d;
@@ -99,35 +89,54 @@ st.markdown("""
 
 @st.cache_data
 def load_data():
-    """Load and cache the PLU data"""
+    """Load and cache the product data"""
     try:
-        # Read CSV with UPC codes as strings to preserve leading zeros
-        df = pd.read_csv('glide_products.csv', dtype={'UPC_Code': str})
+        # Read CSV with UPC codes as strings to preserve formatting
+        df = pd.read_csv('HLA_Prices.csv', dtype={
+            'SU-UPC': str, 
+            'Each-UPC': str, 
+            'Case-UPC': str,
+            'Item': str
+        })
         
-        # Ensure UPC codes are properly formatted as strings
-        df['UPC_Code'] = df['UPC_Code'].astype(str)
+        # Ensure UPC codes are properly formatted as strings and handle NaN values
+        for upc_col in ['SU-UPC', 'Each-UPC', 'Case-UPC']:
+            if upc_col in df.columns:
+                df[upc_col] = df[upc_col].fillna('').astype(str)
         
-        # Create a search-friendly UPC column (remove leading zeros for flexible search)
-        df['UPC_Search'] = df['UPC_Code'].str.lstrip('0')
+        # Create search-friendly columns for flexible UPC search
+        for upc_col in ['SU-UPC', 'Each-UPC', 'Case-UPC']:
+            if upc_col in df.columns:
+                search_col = f'{upc_col}_Search'
+                df[search_col] = df[upc_col].str.replace(r'^0+', '', regex=True)
         
         return df
     except FileNotFoundError:
-        st.error("Please make sure 'glide_products.csv' is in the same directory as this script")
+        st.error("Please make sure 'HLA_Prices.csv' is in the same directory as this script")
         return pd.DataFrame()
 
 def display_result(product):
-    """Display a search result in plain text format"""
-    age_badge = '<span class="age-restricted">🔞 AGE RESTRICTED</span>' if product['Age_Restricted'] == 'Yes' else ''
+    """Display a search result"""
+    # Use Item Description as the main product name
+    product_name = str(product.get('Item Description', 'N/A'))
     
     st.markdown(f"""
     <div class="result-item">
-        <div class="product-name">{product['Product_Name']}{age_badge}</div>
-        <div class="product-info"><strong>UPC Code:</strong> {product['UPC_Code']}</div>
-        <div class="product-info"><strong>Department:</strong> {product['Department_Name']} (Code: {product['Department_Code']})</div>
-        <div class="product-info"><strong>Category:</strong> {product['Category']}</div>
-        <div class="product-info"><strong>Price:</strong> <span class="product-price">{product['Display_Price']}</span></div>
-        <div class="product-info"><strong>Stock Status:</strong> {product['Stock_Status']}</div>
-        <div class="product-info"><strong>Tax Rate:</strong> {product['Tax_Rate']}%</div>
+        <div class="product-name">{product_name}</div>
+        <div class="product-info"><strong>Item:</strong> {str(product.get('Item', 'N/A'))}</div>
+        <div class="product-info"><strong>Site Number:</strong> {str(product.get('Site Number', 'N/A'))}</div>
+        <div class="product-info"><strong>Category:</strong> {str(product.get('Category', 'N/A'))}</div>
+        <div class="product-info"><strong>SU-UPC:</strong> {str(product.get('SU-UPC', 'N/A'))}</div>
+        <div class="product-info"><strong>Each-UPC:</strong> {str(product.get('Each-UPC', 'N/A'))}</div>
+        <div class="product-info"><strong>Case-UPC:</strong> {str(product.get('Case-UPC', 'N/A'))}</div>
+        <div class="product-info"><strong>Pack(SU):</strong> {str(product.get('Pack(SU)', 'N/A'))}</div>
+        <div class="product-info"><strong>Retail:</strong> <span class="product-price">{str(product.get('Retail', 'N/A'))}</span></div>
+        <div class="product-info"><strong>Each Cost:</strong> <span class="product-price">{str(product.get('Each Cost', 'N/A'))}</span></div>
+        <div class="product-info"><strong>Total Cost(SU)/Tax:</strong> {str(product.get('Total Cost(SU)/Tax', 'N/A'))}</div>
+        <div class="product-info"><strong>Total Cost(SU) W/O Tax:</strong> {str(product.get('Total Cost(SU) W/O Tax', 'N/A'))}</div>
+        <div class="product-info"><strong>Eligible for Credit:</strong> {str(product.get('Eligible for Credit', 'N/A'))}</div>
+        <div class="product-info"><strong>Item Status:</strong> {str(product.get('Item Status', 'N/A'))}</div>
+        <div class="product-info"><strong>As of Date:</strong> {str(product.get('As of Date', 'N/A'))}</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -138,6 +147,13 @@ def main():
     if df.empty:
         st.stop()
     
+    # Image and Logo
+    # Display the image
+    try:
+        st.image("image.jpeg", width=200, use_column_width=False)
+    except FileNotFoundError:
+        st.warning("Image file 'image.jpeg' not found. Please make sure it's in the same directory as your script.")
+    
     # Logo
     st.markdown('<div class="logo">🔍 Kirmani\'s Product Search App</div>', unsafe_allow_html=True)
     
@@ -147,7 +163,7 @@ def main():
     # Search input
     search_term = st.text_input(
         "Search Products",
-        placeholder="Enter product name, UPC code, or any keyword...",
+        placeholder="Enter product name, item number, UPC code, or any keyword...",
         label_visibility="collapsed"
     )
     
@@ -158,31 +174,39 @@ def main():
         # Clean the search term
         search_clean = search_term.strip()
         
-        # For UPC search, try both with and without leading zeros
-        upc_search_variants = [search_clean]
+        # Create search mask for different fields
+        search_mask = pd.Series([False] * len(df))
+        
+        # Search in text fields
+        text_columns = ['Item Description', 'Category', 'Item']
+        for col in text_columns:
+            if col in df.columns:
+                search_mask = search_mask | df[col].astype(str).str.contains(search_clean, case=False, na=False)
+        
+        # Search in UPC fields (original and search-friendly versions)
+        upc_columns = ['SU-UPC', 'Each-UPC', 'Case-UPC']
+        for col in upc_columns:
+            if col in df.columns:
+                # Search original UPC
+                search_mask = search_mask | df[col].astype(str).str.contains(search_clean, case=False, na=False)
+                # Search cleaned UPC (without leading zeros)
+                search_col = f'{col}_Search'
+                if search_col in df.columns:
+                    search_mask = search_mask | df[search_col].astype(str).str.contains(search_clean, case=False, na=False)
+        
+        # For numeric searches, also try variations with leading zeros
         if search_clean.isdigit():
-            # Add version with leading zeros removed
-            upc_search_variants.append(search_clean.lstrip('0'))
-            # Add version with leading zeros (common UPC formats)
-            if len(search_clean) < 12:
-                upc_search_variants.append(search_clean.zfill(12))  # Pad to 12 digits
-            if len(search_clean) < 14:
-                upc_search_variants.append(search_clean.zfill(14))  # Pad to 14 digits
-        
-        # Create comprehensive search mask
-        search_mask = (
-            df['Product_Name'].str.contains(search_clean, case=False, na=False) |
-            df['Department_Name'].str.contains(search_clean, case=False, na=False) |
-            df['Category'].str.contains(search_clean, case=False, na=False) |
-            df['Search_Terms'].str.contains(search_clean, case=False, na=False)
-        )
-        
-        # Add UPC search for all variants
-        for variant in upc_search_variants:
-            search_mask = search_mask | (
-                df['UPC_Code'].str.contains(variant, case=False, na=False) |
-                df['UPC_Search'].str.contains(variant, case=False, na=False)
-            )
+            # Add versions with different zero padding
+            upc_variants = [
+                search_clean.zfill(12),  # 12-digit UPC
+                search_clean.zfill(14),  # 14-digit UPC
+                search_clean.lstrip('0')  # Remove leading zeros
+            ]
+            
+            for variant in upc_variants:
+                for col in upc_columns:
+                    if col in df.columns:
+                        search_mask = search_mask | df[col].astype(str).str.contains(variant, case=False, na=False)
         
         filtered_df = df[search_mask]
         
@@ -204,11 +228,12 @@ def main():
     
     else:
         # Welcome message when no search term
-        st.markdown("""
+        total_products = len(df) if not df.empty else 0
+        st.markdown(f"""
         <div class="no-results">
             👋 Welcome to Kirmani's Product Search!<br><br>
-            🔍 Search through 5,123 products<br>
-            📱 Search by product name, UPC code, or category<br>
+            🔍 Search through {total_products:,} products<br>
+            📱 Search by product name, item number, UPC code, or category<br>
             💡 Just type in the search box above to get started
         </div>
         """, unsafe_allow_html=True)
