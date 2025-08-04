@@ -90,14 +90,47 @@ st.markdown("""
 @st.cache_data
 def load_data():
     """Load and cache the product data"""
+    import os
+    
+    # Debug: Show current directory and files
+    current_dir = os.getcwd()
+    files_in_dir = os.listdir(current_dir)
+    
+    st.sidebar.write("🔍 **Debug Info:**")
+    st.sidebar.write(f"Current directory: {current_dir}")
+    st.sidebar.write("Files found:")
+    for file in files_in_dir:
+        st.sidebar.write(f"- {file}")
+    
     try:
-        # Read CSV with UPC codes as strings to preserve formatting
-        df = pd.read_csv('HLA_Prices.csv', dtype={
-            'SU-UPC': str, 
-            'Each-UPC': str, 
-            'Case-UPC': str,
-            'Item': str
-        })
+        # Try to read the CSV file with different encodings and options
+        try:
+            df = pd.read_csv('HLA_Prices.csv', dtype={
+                'SU-UPC': str, 
+                'Each-UPC': str, 
+                'Case-UPC': str,
+                'Item': str
+            }, encoding='utf-8')
+        except UnicodeDecodeError:
+            # Try with different encoding
+            df = pd.read_csv('HLA_Prices.csv', dtype={
+                'SU-UPC': str, 
+                'Each-UPC': str, 
+                'Case-UPC': str,
+                'Item': str
+            }, encoding='latin-1')
+        except:
+            # Try without dtype specification
+            df = pd.read_csv('HLA_Prices.csv')
+        
+        st.sidebar.success(f"✅ CSV loaded successfully! Rows: {len(df)}")
+        st.sidebar.write("📋 **Columns found:**")
+        for col in df.columns:
+            st.sidebar.write(f"- '{col}'")
+        
+        # Show first few rows for debugging
+        st.sidebar.write("📊 **Sample data:**")
+        st.sidebar.dataframe(df.head(2))
         
         # Ensure UPC codes are properly formatted as strings and handle NaN values
         for upc_col in ['SU-UPC', 'Each-UPC', 'Case-UPC']:
@@ -111,8 +144,17 @@ def load_data():
                 df[search_col] = df[upc_col].str.replace(r'^0+', '', regex=True)
         
         return df
-    except FileNotFoundError:
-        st.error("Please make sure 'HLA_Prices.csv' is in the same directory as this script")
+        
+    except FileNotFoundError as e:
+        st.sidebar.error(f"❌ File not found: {e}")
+        st.error("❌ **HLA_Prices.csv not found!** Please check:")
+        st.error("1. File name is exactly 'HLA_Prices.csv' (case sensitive)")
+        st.error("2. File is in the root directory of your repository")
+        st.error("3. File was properly uploaded to GitHub")
+        return pd.DataFrame()
+    except Exception as e:
+        st.sidebar.error(f"❌ Error loading file: {e}")
+        st.error(f"Error loading CSV: {str(e)}")
         return pd.DataFrame()
 
 def display_result(product):
@@ -160,12 +202,69 @@ def main():
     # Search container
     st.markdown('<div class="search-container">', unsafe_allow_html=True)
     
-    # Search input
-    search_term = st.text_input(
-        "Search Products",
-        placeholder="Enter product name, item number, UPC code, or any keyword...",
+    # Search options
+    search_method = st.radio(
+        "Choose search method:",
+        ["🔍 Text Search", "📷 Barcode Scanner"],
+        horizontal=True,
         label_visibility="collapsed"
     )
+    
+    search_term = ""
+    
+    if search_method == "🔍 Text Search":
+        # Text search input
+        search_term = st.text_input(
+            "Search Products",
+            placeholder="Enter product name, item number, UPC code, or any keyword...",
+            label_visibility="collapsed"
+        )
+    
+    elif search_method == "📷 Barcode Scanner":
+        st.markdown("📱 **Take a photo of the barcode with your phone camera:**")
+        
+        # Camera input for barcode scanning
+        camera_image = st.camera_input("Scan Barcode", label_visibility="collapsed")
+        
+        if camera_image is not None:
+            try:
+                # You'll need to install: pip install pyzbar pillow
+                from pyzbar import pyzbar
+                from PIL import Image
+                import numpy as np
+                
+                # Convert the uploaded image to PIL format
+                image = Image.open(camera_image)
+                
+                # Decode barcodes from the image
+                barcodes = pyzbar.decode(image)
+                
+                if barcodes:
+                    # Get the first barcode found
+                    barcode_data = barcodes[0].data.decode('utf-8')
+                    search_term = barcode_data
+                    st.success(f"✅ Barcode detected: {barcode_data}")
+                    
+                    # Show the image with detected barcode highlighted
+                    st.image(image, caption=f"Detected barcode: {barcode_data}", width=300)
+                    
+                else:
+                    st.error("❌ No barcode detected in the image. Please try again with a clearer photo.")
+                    
+            except ImportError:
+                st.error("📦 Barcode scanning requires additional packages. Please install: `pip install pyzbar pillow`")
+            except Exception as e:
+                st.error(f"❌ Error processing image: {str(e)}")
+        
+        # Also provide manual UPC input as backup
+        st.markdown("**Or enter UPC manually:**")
+        manual_upc = st.text_input(
+            "Manual UPC Entry",
+            placeholder="Enter UPC code manually...",
+            label_visibility="collapsed"
+        )
+        if manual_upc:
+            search_term = manual_upc
     
     st.markdown('</div>', unsafe_allow_html=True)
     
