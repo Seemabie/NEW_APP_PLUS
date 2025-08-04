@@ -190,11 +190,13 @@ def main():
         st.stop()
     
     # Image and Logo
-    # Display the image
-    try:
-        st.image("image.jpeg", width=200, use_column_width=False)
-    except FileNotFoundError:
-        st.warning("Image file 'image.jpeg' not found. Please make sure it's in the same directory as your script.")
+    # Display the image (centered and smaller)
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col2:
+        try:
+            st.image("image.jpeg", width=150)
+        except FileNotFoundError:
+            st.warning("Image file 'image.jpeg' not found. Please make sure it's in the same directory as your script.")
     
     # Logo
     st.markdown('<div class="logo">🔍 Kirmani\'s Product Search App</div>', unsafe_allow_html=True)
